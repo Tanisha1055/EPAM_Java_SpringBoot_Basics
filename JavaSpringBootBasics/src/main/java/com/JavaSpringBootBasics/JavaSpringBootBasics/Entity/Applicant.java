@@ -35,6 +35,17 @@ public class Applicant {
         this.resume=resume;
     }
 
+    @ManyToMany(mappedBy = "applicants",cascade =CascadeType.ALL)
+    public List<Job> jobs=new ArrayList<>();
+
+    public List<Job> getJobs() {
+        return jobs;
+    }
+
+    public void setJobs(List<Job> jobs) {
+        this.jobs = jobs;
+    }
+
     public Resume getResume() {
         return resume;
     }
@@ -99,3 +110,10 @@ public class Applicant {
 //used , with the rest everything same of mappedBy and the cascadeType. But as we know that
 //It has many applications , so the field will have a List of applications, associated with
 //1 applicant , not just application. (As it indicates 1 applicant relationship).
+
+//Now we know that 1 applicant can apply for many jobs , and 1 job can be applied by many
+//applicant , so the relation is @ManyToMany , decided by seeing both the sides. As if
+//@OneToMany from the applicant perspective then that would imply that One Job would belong
+//to only One applicant exclusively , which is not the case here , as one job can be owned
+//by multiple applicants .
+//So again just list of jobs , with mappedBy and cascadeType .
