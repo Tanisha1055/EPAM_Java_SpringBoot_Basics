@@ -1,0 +1,171 @@
+1. Handling Exceptions Globally with @RestControllerAdvice and @ExceptionHandler
+
+Theory
+
+(i) @RestControllerAdvice is a special Spring annotation that allows you to handle exceptions
+across your whole application in one place (global error handling).
+(ii) @ExceptionHandler is used inside a controller or advice class to specify which method
+should handle a particular exception type.
+
+Implementation
+Global Exception Handler Example:
+
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    // Handle a specific exception (e.g., resource not found)
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<String> handleResourceNotFound(ResourceNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    // Handle all other exceptions
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleAllExceptions(Exception ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                             .body("An unexpected error occurred: " + ex.getMessage());
+    }
+}
+
+
+How it works:
+
+(i) If any controller throws a ResourceNotFoundException, the first handler returns a 404
+status and the exception message.
+(ii) Any other unhandled exception returns a 500 status and a generic error message.
+
+
+2. Validating Request Bodies and Handling Validation Exceptions Using @Valid
+
+Theory
+(i) @Valid is used to trigger validation on request bodies (DTOs or entities) based on annotations
+like @NotNull, @Size, etc.
+(ii) If validation fails, Spring throws a MethodArgumentNotValidException.
+
+Implementation
+DTO with Validation Annotations:
+
+public class UserDTO {
+    @NotBlank(message = "Name is required")
+    private String name;
+
+    @Email(message = "Email should be valid")
+    private String email;
+    // getters and setters
+}
+
+Controller:
+
+@PostMapping("/users")
+public ResponseEntity<User> createUser(@Valid @RequestBody UserDTO userDTO) {
+    // If validation fails, exception is thrown before this line
+    User user = new User(userDTO.getName(), userDTO.getEmail());
+    return ResponseEntity.status(HttpStatus.CREATED).body(user);
+}
+
+Handling Validation Errors Globally:
+
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getFieldErrors().forEach(error ->
+            errors.put(error.getField(), error.getDefaultMessage())
+        );
+        return ResponseEntity.badRequest().body(errors); // 400 Bad Request
+    }
+}
+
+How it works:
+
+If the client sends invalid data, Spring returns a 400 Bad Request with details about which
+fields failed validation.
+
+3. Returning Proper HTTP Status Codes (404, 400, 500) for Error Scenarios
+
+Theory
+404 Not Found: Resource doesn’t exist (e.g., user not found).
+400 Bad Request: Client sent invalid data (e.g., validation failed).
+500 Internal Server Error: Unexpected server error.
+
+Implementation
+Throwing Custom Exceptions in Controller:
+
+@GetMapping("/users/{id}")
+public ResponseEntity<User> getUser(@PathVariable Long id) {
+    User user = userRepository.findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + id));
+    return ResponseEntity.ok(user);
+}
+
+Custom Exception:
+
+public class ResourceNotFoundException extends RuntimeException {
+    public ResourceNotFoundException(String message) {
+        super(message);
+    }
+}
+
+Handled by GlobalExceptionHandler (see above), which returns 404.
+
+4. Summary Table
+
+Scenario	          Exception/Annotation	              HTTP Status	Example Handler Method
+
+Resource not found	  Custom Exception + @ExceptionHandler	 404	    handleResourceNotFound
+Validation failed	  @Valid + @ExceptionHandler	         400	    handleValidationExceptions
+Unexpected error	  Exception + @ExceptionHandler	         500	    handleAllExceptions
+
+
+Q.What happens if I don't give valid annotation?
+
+1. Without @Valid
+
+@PostMapping("/users")
+public ResponseEntity<User> createUser(@RequestBody UserDTO userDTO) {
+    // No @Valid here
+    User user = new User(userDTO.getName(), userDTO.getEmail());
+    return ResponseEntity.status(HttpStatus.CREATED).body(user);
+}
+
+What happens:
+(i)   Validation annotations (like @NotBlank, @Email) on your UserDTO fields are ignored.
+(ii)  Spring does NOT automatically check if the incoming data is valid.
+(iii) If the client sends invalid data (e.g., empty name, invalid email), the method will
+      still execute, and you may save invalid data to your database.
+(iv) No validation exception is thrown by Spring.
+
+
+2. With @Valid
+
+@PostMapping("/users")
+public ResponseEntity<User> createUser(@Valid @RequestBody UserDTO userDTO) {
+    // Validation is triggered here
+    User user = new User(userDTO.getName(), userDTO.getEmail());
+    return ResponseEntity.status(HttpStatus.CREATED).body(user);
+}
+
+What happens:
+
+(i)   Spring checks all validation annotations on UserDTO.
+(ii)  If any field is invalid, Spring throws a MethodArgumentNotValidException before your
+      method body runs.
+(iii) You can handle this exception globally (e.g., with @RestControllerAdvice) to return a
+      400 Bad Request and error details.
+
+
+3. Summary Table
+
+With @Valid                                       	Without @Valid
+
+Validation runs	                                    No validation
+Invalid data rejected (400)	                        Invalid data accepted
+Exception thrown on invalid input	                No exception, method runs
+
+
+In short:
+
+(i)  Without @Valid, validation is skipped and invalid data can be processed or saved.
+(ii) With @Valid, Spring checks the data and rejects invalid input with a 400 error [1] [2].

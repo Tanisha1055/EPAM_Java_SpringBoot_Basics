@@ -1,0 +1,37 @@
+Enum (Enumeration) in Java:
+
+An enum is a special data type that defines a set of named, constant values. It is used to
+represent fixed sets of options, making code more type-safe and readable by restricting
+variables to predefined values.
+
+An enum is like a list of options you can choose from.
+For example, if you want to represent the status of a user, you might have only three
+valid statuses: ACTIVE, INACTIVE, and BANNED.
+
+Example
+
+public enum Status {
+    ACTIVE,
+    INACTIVE,
+    BANNED
+}
+
+Now, any variable of type Status can only be one of these three values.
+
+Status userStatus = Status.ACTIVE;
+Why Use Enums?
+Type safety: Prevents invalid values (e.g., you can’t set userStatus to "DELETED" unless it’s
+defined in the enum).
+
+Readability: Code is easier to understand.
+Maintainability: If you need to add or remove options, you do it in one place.
+
+Enums in JPA
+When you use enums in JPA entities, you can store them in the database as either their name
+(string) or their position (ordinal).
+
+Best practice: Store as string for clarity.
+
+@Enumerated(EnumType.STRING)
+private Status status;
+

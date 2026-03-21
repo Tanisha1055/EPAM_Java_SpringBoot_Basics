@@ -1,0 +1,25 @@
+ApplicationContext:
+
+Definition: ApplicationContext is a more advanced container compared to BeanFactory.
+Role: It includes everything BeanFactory does, plus more features like:
+
+Internationalization (i18n)
+Event propagation
+Application-layer specific contexts (e.g., WebApplicationContext)
+Bean auto-wiring
+
+Usage: It is the standard container in most Spring applications.
+Example:
+
+ApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");
+UserService userService = context.getBean(UserService.class);
+
+Note: ApplicationContext eagerly creates all singleton beans at startup.
+
+Feature	                    BeanFactory	                         ApplicationContext
+
+Definition	                Basic IoC container	                 Advanced IoC container (extends BeanFactory)
+Initialization	            Lazy (beans created when requested)	 Eager (singleton beans created at startup)
+Features	                Only basic DI	                     DI + event handling, i18n, AOP, etc.
+Use Case	                Lightweight, memory-sensitive apps	 Standard for most Spring applications
+Common Usage	            Rarely used directly in modern apps	 Used in almost all Spring projects

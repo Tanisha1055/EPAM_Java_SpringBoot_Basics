@@ -1,0 +1,126 @@
+1. Why Pagination and Sorting?
+
+Pagination: Breaks large result sets into smaller chunks (pages), making data retrieval
+efficient and user-friendly.
+Sorting: Orders results by one or more fields (ascending or descending).
+
+2. Key Interfaces and Classes
+
+a. Pageable
+Represents pagination information (page number, page size, sorting).
+Used as a parameter in repository methods.
+
+Type: Interface
+Purpose: Represents pagination information (page number, page size, sorting).
+Usage: Used as a parameter in repository methods to request a specific page of data.
+
+Ex:
+
+Pageable pageable = PageRequest.of(0, 10); // First page, 10 items per page
+
+Info:
+In the statement:
+
+PageRequest.of(0, 10)
+0 is the first page (page numbers start from 0 in Spring Data JPA).
+10 is the page size, meaning 10 items per page.
+So, if you have 50 users in your database and you use PageRequest.of(0, 10), you will get the first 10 users.
+If you use PageRequest.of(1, 10), you will get the next 10 users (users 11–20), and so on.
+
+b. Page
+Represents a single page of results, including content, total pages, total elements, etc.
+Type: Interface
+Purpose: Represents a single page of results, including:
+The content (list of entities)
+Total pages
+Total elements
+Current page info
+Usage: Returned by repository methods when you use Pageable.
+
+Ex:
+Page<User> page = userRepository.findAll(pageable);
+List<User> users = page.getContent();
+int totalPages = page.getTotalPages();
+long totalElements = page.getTotalElements();
+
+c. Sort
+Represents sorting information (field, direction).
+Type: Class
+Purpose: Represents sorting information (field, direction: ASC/DESC).
+Usage: Used as a parameter in repository methods or combined with PageRequest for
+paginated and sorted results.
+
+Ex:
+
+Sort sort = Sort.by(Sort.Direction.ASC, "name");
+List<User> users = userRepository.findAll(sort);
+
+3. Implementing Pagination
+
+Theory
+You use Pageable to specify which page and how many items per page you want.
+Repository methods return a Page<T> object.
+
+Implementation
+Repository Example:
+
+public interface UserRepository extends JpaRepository<User, Long> {
+    Page<User> findByStatus(Status status, Pageable pageable);
+}
+
+Service Example:
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+
+Page<User> page = userRepository.findByStatus(Status.ACTIVE, PageRequest.of(0, 10));
+// 0 = first page, 10 = page size
+List<User> users = page.getContent();
+int totalPages = page.getTotalPages();
+long totalElements = page.getTotalElements();
+
+
+4. Implementing Sorting
+
+Theory
+Use the Sort class to specify sorting by field(s) and direction (ASC/DESC).
+
+Implementation
+Repository Example:
+
+List<User> findAll(Sort sort);
+
+Service Example:
+
+import org.springframework.data.domain.Sort;
+
+List<User> users = userRepository.findAll(Sort.by(Sort.Direction.ASC, "name"));
+List<User> usersDesc = userRepository.findAll(Sort.by(Sort.Direction.DESC, "age"));
+
+
+5. Combining Pagination and Sorting
+
+Theory
+You can combine both by passing sorting info to the PageRequest (which implements Pageable).
+
+Implementation
+Service Example:
+
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+
+PageRequest pageRequest = PageRequest.of(0, 10, Sort.by("name").descending());
+Page<User> page = userRepository.findByStatus(Status.ACTIVE, pageRequest);
+List<User> users = page.getContent();
+
+
+6. Custom Repository Methods
+
+You can use pagination and sorting in custom queries:
+
+Ex:
+
+@Query("SELECT u FROM User u WHERE u.status = :status")
+Page<User> findActiveUsers(@Param("status") Status status, Pageable pageable);
+
+.

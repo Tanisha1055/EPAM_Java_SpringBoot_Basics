@@ -1,0 +1,226 @@
+Q. How OneToMany is Mapped in the Database
+
+Example Scenario
+Suppose you have two entities:
+
+User (one user)
+Order (many orders per user)
+
+Java Entity Mapping
+
+@Entity
+public class User {
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    private String name;
+
+    @OneToMany(mappedBy = "user")
+    private List<Order> orders;
+}
+
+@Entity
+public class Order {
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    private String product;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id") // Foreign key column in Order table
+    private User user;
+}
+
+How This Looks in the Database
+
+User Table:
+
+id	                        name
+1	                        Alice
+
+Order Table:
+
+id	                        product	                          user_id
+
+1	                        Book	                           1
+2	                        Laptop	                           1
+
+Explanation:
+
+The Order table has a column user_id (foreign key) that references the id column in the User
+table.
+This means each order "belongs" to one user, but a user can have many orders.
+
+Summary:
+
+(i)   In Java, you use @OneToMany on the parent and @ManyToOne on the child.
+(ii)  In the database, the "many" side table (Order) has a foreign key column pointing to
+      the "one" side (User).
+(iii) This is how the relationship is mapped and enforced in the database [1].
+
+
+Q.What will happen if you remove @ManyToOne mapping annotation from one or the other?
+
+If you remove the @OneToMany or @ManyToOne annotation from your entity classes, several
+important things will happen:
+
+1. No Relationship Mapping:
+
+(i) JPA/Hibernate will not know about the relationship between the two entities.
+(ii) The framework will not automatically join or fetch related data for you.
+
+2. Database Foreign Key:
+
+(i) If you remove @ManyToOne from the child entity (e.g., Order), the foreign key column (user_id)
+will not be created in the database table when you generate the schema.
+(ii) If you remove @OneToMany from the parent entity (e.g., User), but keep @ManyToOne in the child,
+the foreign key will still exist, but you won’t be able to easily access the list of related
+entities from the parent side in Java.
+
+3. Data Access:
+
+(i) Without these annotations, you cannot use JPA to automatically fetch or save related entities.
+For example, you won’t be able to do user.getOrders() if @OneToMany is missing.
+You would have to manually write queries to fetch related data.
+
+4. Referential Integrity:
+
+(i) If you remove both annotations, there is no relationship at the Java or database level.
+The tables will be independent, and you lose referential integrity (no foreign key constraint).
+
+
+Summary Table
+
+Annotation Removed	  Effect in Java Code	                 Effect in Database
+@OneToMany	          Can't access child list from parent	  Foreign key still exists if
+                                                              @ManyToOne is present in child
+@ManyToOne	          Can't access parent from child	      No foreign key column in child
+                                                              table
+Both	              No relationship in code or DB	          No foreign key, tables are
+                                                              independent
+
+
+In short:
+
+Removing these annotations breaks the automatic relationship mapping between your entities
+and in your database schema. You lose the benefits of object-relational mapping and must
+handle relationships manually
+
+
+
+Q. What Happens If @ManyToOne Is Removed?
+
+1. No Relationship Mapping in Java
+
+The user field in Order is now just a regular field (not a JPA relationship).
+JPA/Hibernate will not know that user is supposed to reference a User entity.
+You cannot use order.getUser() to automatically fetch the related user entity.
+
+2. Database Schema
+If you generate the database schema from your entities, the user_id foreign key column
+will not be created in the order table.
+There will be no foreign key constraint between order and user.
+
+3. Data Fetching
+When you call orderRepository.findById(1L), JPA will only fetch the fields that are mapped.
+The user field will be ignored (unless you manually map it as a column or another type).
+You will not be able to fetch the related user with order.getUser()—it will either be null
+or cause an error, depending on how you define the field.
+
+4. Manual Handling Required
+If you want to associate an order with a user, you would have to manage the relationship
+yourself (e.g., by storing a userId field and manually querying the User table).
+
+
+Example: What the Code Looks Like Without @ManyToOne
+
+
+@Entity
+public class Order {
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    private String product;
+
+    // No @ManyToOne annotation
+    private Long userId; // Just a plain field, not a relationship
+}
+
+Fetching the user manually:
+
+
+Optional<Order> orderOpt = orderRepository.findById(1L);
+if (orderOpt.isPresent()) {
+    Order order = orderOpt.get();
+    Long userId = order.getUserId();
+    // You must now manually fetch the user:
+    Optional<User> userOpt = userRepository.findById(userId);
+}
+
+
+Summary Table
+
+With @ManyToOne	                                       Without @ManyToOne
+
+JPA manages relationship	                           No relationship in JPA
+Foreign key in DB	                                   No foreign key in DB
+order.getUser() works	                               order.getUser() is null/invalid
+Automatic fetching	                                   Manual fetching required
+
+
+Q. So if I pass by id, like findById(1) , then it will find the first id=1 , or what ?
+
+
+Yes, if you use a method like findById(1) in Spring Data JPA, it will search for and return
+the entity whose primary key (id) is 1—regardless of any relationships to other entities.
+
+Here’s what happens:
+
+(i)   findById(1) looks for a row in the table where the id column equals 1.
+(ii)  If the entity exists, it returns that entity object.
+(iii) If the entity does not exist, it returns Optional.empty() (or null if you use older JPA
+methods).
+
+Important:
+
+(i) If you have removed relationship annotations (@OneToMany, @ManyToOne), findById(1) will
+still work for finding the entity by its primary key.
+(ii) However, you won’t be able to automatically access related entities (like
+user.getOrders()) because JPA doesn’t know about the relationship anymore [1].
+
+
+Summary:
+
+(i)  findById(1) always finds the entity with id=1 in the specified table.
+(ii) Relationships to other tables/entities are ignored if not mapped.
+
+Q. What Query Does JPA Generate?
+
+When you call orderRepository.findById(1L), JPA generates a SQL query like:
+
+SELECT * FROM order WHERE id = 1;
+
+a.The result includes the user_id column (foreign key).
+b.JPA then uses the user_id to fetch the associated User entity if you access it (this is
+called "lazy loading" by default).
+
+If you access order.getUser(), JPA may issue another query:
+
+SELECT * FROM user WHERE id = ?;
+
+The ? is replaced with the value of user_id from the order row.
+
+Summary Table
+
+Action	                                        SQL Query Generated
+
+findById(1L) on Order	                        SELECT * FROM order WHERE id = 1;
+order.getUser() (if lazy)	                    SELECT * FROM user WHERE id = user_id;
+
+
+
+
+

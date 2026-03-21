@@ -1,0 +1,94 @@
+1. What is Spring Data JPA?
+
+Theory
+Spring Data JPA is a part of the larger Spring Data family, designed to simplify data access
+layers in Java applications. It builds on top of the Java Persistence API (JPA) and provides
+a repository abstraction layer, making it easier to implement data access with minimal
+boilerplate code.
+
+(i) JPA is a Java specification for managing, persisting, and accessing data between Java
+objects and relational databases.
+(ii) Spring Data JPA provides an additional layer that automates repository creation, query
+generation, and integrates seamlessly with Spring’s ecosystem.
+
+2. Advantages of Spring Data JPA:
+
+a. Simplified Repository Interface
+
+Theory:
+You only need to define an interface for your repository, and Spring Data JPA provides the
+implementation at runtime.
+
+Implementation:
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface UserRepository extends JpaRepository<User, Long> {
+    // No implementation needed!
+}
+
+JpaRepository provides CRUD operations, pagination, and more out of the box.
+
+b. Query Derivation
+
+Theory:
+Spring Data JPA can generate queries from method names in your repository interface. This
+means you don’t have to write SQL or JPQL for simple queries.
+
+Implementation:
+
+List<User> findByLastName(String lastName);
+User findByEmail(String email);
+List<User> findByAgeGreaterThan(int age);
+
+The method name tells Spring Data JPA how to generate the query.
+
+c. Transaction Management
+
+Theory:
+Spring Data JPA integrates with Spring’s transaction management. By default, repository
+methods are transactional.
+
+Implementation:
+
+@Service
+public class UserService {
+    @Autowired
+    private UserRepository userRepository;
+
+    @Transactional
+    public void updateUser(User user) {
+        userRepository.save(user);
+    }
+}
+
+The @Transactional annotation ensures that the method runs within a transaction.
+
+In simple terms, when a method is annotated with @Transactional in Spring, it means that all
+the operations inside that method are executed as a single unit of work—a transaction. If
+everything inside the method completes successfully, the changes are saved (committed) to the
+database. If any part of the method fails (for example, an exception is thrown), all changes
+made during that method are undone (rolled back), so the database remains unchanged by that
+method call.
+
+d. Integration with JPA/Hibernate
+
+Theory:
+Spring Data JPA works on top of JPA, and Hibernate is the most common JPA implementation.
+You can use JPA annotations in your entities, and Spring Data JPA will handle the rest.
+
+Implementation:
+
+@Entity
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+    private String email;
+    // getters and setters
+}
+
+Annotate your classes with JPA annotations (@Entity, @Id, etc.).
+Spring Data JPA will use Hibernate (or another JPA provider) under the hood.

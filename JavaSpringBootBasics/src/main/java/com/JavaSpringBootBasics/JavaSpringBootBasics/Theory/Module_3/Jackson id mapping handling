@@ -1,0 +1,97 @@
+Q. but the feild type is User , not int , so by passing just 1 , in the post api so
+how will we be getting it ?
+
+Scenario: Field Type is User, JSON Contains Only ID
+
+Entity:
+
+@Entity
+public class Order {
+    @Id
+    @GeneratedValue
+    private Long id;
+
+    private String product;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+}
+
+
+POST Request JSON
+json
+
+{
+  "product": "Book",
+  "user": { "id": 1 }
+}
+
+How Does Spring/Jackson Handle This?
+
+(i) When you send { "user": { "id": 1 } }, Jackson (the JSON library used by Spring) tries to
+create a User object and sets only its id field to 1.
+(ii) The other fields of User (like name, email) are left null in this deserialized object.
+(iii) Spring/JPA does NOT fetch the full User object at this point.
+
+When you call orderRepository.save(order), JPA sees that the Order has a User object with only
+the id set.
+a. JPA uses the id to set the foreign key (user_id) in the order table.
+b. JPA does not insert a new user; it just links the order to the existing user with id=1.
+
+What If You Pass Only the ID (Not an Object)?
+
+If you try to send:
+
+{
+  "product": "Book",
+  "user": 1
+}
+
+This will not work by default with a User-typed field, because Jackson expects an object for
+the user field, not a number.
+
+You would get a deserialization error unless you write a custom deserializer or use a DTO.
+
+Best Practice: Use a DTO for Simpler Input
+
+DTO Example:
+
+public class OrderDTO {
+    private String product;
+    private Long userId;
+}
+
+Controller:
+
+@PostMapping("/orders")
+public Order createOrder(@RequestBody OrderDTO orderDTO) {
+    User user = userRepository.findById(orderDTO.getUserId())
+        .orElseThrow(() -> new RuntimeException("User not found"));
+    Order order = new Order();
+    order.setProduct(orderDTO.getProduct());
+    order.setUser(user);
+    return orderRepository.save(order);
+}
+
+POST JSON:
+
+{
+  "product": "Book",
+  "userId": 1
+}
+
+Summary Table
+
+Field Type in Entity	      JSON Input Needed	             What Happens?
+User user	                  { "user": { "id": 1 }}	     Jackson creates User with id=1,
+                                                             JPA links by id
+Long userId	                  { "userId": 1 }	             Jackson sets userId, you fetch
+                                                             User manually
+
+
+In short:
+
+a.If your field is User, you must send an object with at least the id in the JSON.
+b.Jackson will create a User with only the id set.
+c.JPA will use that id to set the foreign key, linking the order to the existing user.

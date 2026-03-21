@@ -1,0 +1,103 @@
+1. What is Spring Boot?
+
+Spring Boot is an extension of the Spring Framework that makes it easy to create stand-alone,
+production-ready Spring applications with minimal configuration.
+
+Key Points:
+
+It eliminates the need for complex XML or manual configuration.
+It provides defaults for most settings, so you can get started quickly.
+It’s opinionated: it chooses sensible defaults, but you can override them.
+In Simple Terms:
+Spring Boot lets you build Spring applications faster, with less code and configuration.
+
+2. How Does Spring Boot Simplify Spring Usage?
+a. Auto-Configuration
+Spring Boot automatically configures your application based on the libraries on your classpath.
+For example, if you add spring-boot-starter-web, it auto-configures Tomcat, Spring MVC, and
+JSON support.
+You can override any auto-configuration if you need custom behavior.
+
+Example: Just add the dependency:
+
+xml
+
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+And Spring Boot will set up a web server for you—no XML or manual setup needed.
+
+b. Starter Dependencies
+Starters are pre-defined dependency descriptors you can include in your project.
+Each starter brings in a set of commonly used dependencies for a specific feature (web, data,
+security, etc.).
+This avoids version conflicts and saves you from managing lots of individual dependencies.
+Common Starters:
+
+spring-boot-starter-web (for REST APIs and web apps)
+spring-boot-starter-data-jpa (for database access with JPA)
+spring-boot-starter-security (for security features)
+
+c. Embedded Servers
+Spring Boot can run your application with an embedded server (like Tomcat, Jetty, or Undertow).
+No need to deploy your app to an external server—just run your JAR file and it works.
+This makes development, testing, and deployment much easier.
+Example: You can run your app with:
+
+bash
+
+mvn spring-boot:run
+
+or
+
+bash
+
+java -jar target/myapp.jar
+
+and it starts an embedded web server automatically.
+
+3. Spring Boot Architecture Overview:
+
+a. Layers of Spring Boot:
+
+Starters:
+Provide ready-to-use dependencies for common features.
+
+Auto-Configuration:
+Automatically configures beans based on your project’s dependencies and settings.
+
+Spring Boot CLI:
+Command-line tool for running and testing Spring Boot apps.
+
+Actuator:
+Adds production-ready features like health checks, metrics, and monitoring.
+
+Embedded Servers:
+Lets you run your app as a stand-alone JAR with an embedded web server.
+
+b. How a Typical Spring Boot App Works:
+
+You write your main class with @SpringBootApplication:
+
+@SpringBootApplication
+public class MyApp {
+    public static void main(String[] args) {
+        SpringApplication.run(MyApp.class, args);
+    }
+}
+
+You add your controllers, services, and repositories as usual.
+Spring Boot auto-configures everything based on your dependencies and properties.
+You run your app as a simple Java application—no external server or XML needed.
+
+4. Advantages of Spring Boot
+
+Feature	                          Benefit
+
+Auto-Configuration	              Reduces boilerplate, speeds up setup
+Starter Dependencies	          Simplifies dependency management, avoids version conflicts
+Embedded Servers	              Easy to run, test, and deploy apps as stand-alone JARs
+Production-Ready	              Built-in health checks, metrics, and monitoring with Actuator
+Convention Over Configuration	  Sensible defaults, but fully customizable
+Microservices Ready	              Ideal for building microservices architectures

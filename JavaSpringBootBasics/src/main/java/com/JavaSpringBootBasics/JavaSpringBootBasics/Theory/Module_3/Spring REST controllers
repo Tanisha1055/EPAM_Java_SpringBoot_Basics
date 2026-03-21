@@ -1,0 +1,102 @@
+]1. Creating REST Controllers with @RestController
+
+Theory:
+@RestController is a Spring annotation that marks a class as a REST controller.
+It combines @Controller and @ResponseBody, so every method returns data (like JSON) directly,
+not a view (like HTML).
+
+Implementation:
+
+@RestController
+public class UserController {
+    // Methods here will return JSON by default
+}
+
+2. Mapping URLs with @RequestMapping, @GetMapping, @PostMapping, etc.
+
+Theory:
+You use these annotations to connect HTTP requests (like GET, POST) to Java methods.
+@RequestMapping is general; @GetMapping, @PostMapping, @PutMapping, and @DeleteMapping are
+shortcuts for specific HTTP methods.
+
+Implementation:
+
+@RestController
+@RequestMapping("/users") // Base URL for all methods in this controller
+public class UserController {
+
+    @GetMapping // Handles GET /users
+    public List<User> getAllUsers() { ... }
+
+    @GetMapping("/{id}") // Handles GET /users/123
+    public User getUserById(@PathVariable Long id) { ... }
+
+    @PostMapping // Handles POST /users
+    public User createUser(@RequestBody User user) { ... }
+
+    @PutMapping("/{id}") // Handles PUT /users/123
+    public User updateUser(@PathVariable Long id, @RequestBody User user) { ... }
+
+    @DeleteMapping("/{id}") // Handles DELETE /users/123
+    public void deleteUser(@PathVariable Long id) { ... }
+}
+
+3. Handling Request Parameters with @RequestParam and @PathVariable
+
+Theory:
+@RequestParam gets query parameters from the URL (like ?name=Alice).
+@PathVariable gets values from the URL path (like /users/123).
+
+Implementation:
+
+// Example: GET /users/search?name=Alice
+@GetMapping("/search")
+public List<User> searchUsers(@RequestParam String name) {
+    // 'name' comes from the query parameter
+    return userService.findByName(name);
+}
+
+// Example: GET /users/123
+@GetMapping("/{id}")
+public User getUserById(@PathVariable Long id) {
+    // 'id' comes from the URL path
+    return userService.findById(id);
+}
+
+4. Accepting JSON Data with @RequestBody
+
+Theory:
+@RequestBody tells Spring to convert incoming JSON into a Java object.
+Used for POST and PUT requests, where the client sends data.
+
+Implementation:
+
+Ex:
+
+// Example: POST /users with JSON body
+@PostMapping
+public User createUser(@RequestBody User user) {
+    // 'user' is automatically populated from the JSON request body
+    return userService.save(user);
+}
+
+// Example: PUT /users/123 with JSON body
+@PutMapping("/{id}")
+public User updateUser(@PathVariable Long id, @RequestBody User user) {
+    // 'user' is populated from JSON, 'id' from URL
+    return userService.update(id, user);
+}
+
+5. Summary Table
+
+Annotation	               Purpose	                               Example Usage
+
+@RestController	           Marks class as REST controller	       @RestController
+@RequestMapping	           Maps URL to method (any HTTP method)	   @RequestMapping("/users")
+@GetMapping	               Maps GET requests	                   @GetMapping("/{id}")
+@PostMapping	           Maps POST requests	                   @PostMapping
+@PutMapping	               Maps PUT requests	                   @PutMapping("/{id}")
+@DeleteMapping	           Maps DELETE requests	                   @DeleteMapping("/{id}")
+@RequestParam	           Gets query parameter from URL	       @RequestParam String name
+@PathVariable	           Gets value from URL path	               @PathVariable Long id
+@RequestBody	           Gets JSON from request body	           @RequestBody User user

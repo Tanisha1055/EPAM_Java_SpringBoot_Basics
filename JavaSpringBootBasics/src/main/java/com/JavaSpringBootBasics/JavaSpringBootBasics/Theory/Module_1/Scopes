@@ -1,0 +1,94 @@
+Scopes:
+Spring beans can have different scopes, which define how many instances of a bean Spring
+creates and how they are shared.
+
+Types:
+
+a. Singleton (Default):
+Definition: Only one instance per Spring container.
+Usage: Most beans (stateless services, DAOs).
+Example:
+
+@Component
+@Scope("singleton")
+public class EmailService { }
+Behavior: Every request for this bean returns the same instance.
+
+b. Prototype:
+Definition: A new instance is created every time the bean is requested.
+Usage: For stateful beans or beans that need to be different for each use.
+Example:
+
+@Component
+@Scope("prototype")
+public class UserSession { }
+Behavior: Each request gets a new instance.
+
+c. Web-specific Scopes:
+1.Request:
+One bean per HTTP request.
+Ex:
+
+@Component
+@Scope("request")
+public class RequestBean { }
+
+2.Session:
+One bean per HTTP session.
+Ex:
+
+@Component
+@Scope("session")
+public class SessionBean { }
+
+3.Application:
+One bean per ServletContext (web app).
+Ex:
+
+@Component
+@Scope("application")
+public class AppBean { }
+
+4.WebSocket:
+One bean per WebSocket session.
+Ex:
+
+@Component
+@Scope("websocket")
+public class WebSocketBean { }
+
+Note: Web scopes require a web-aware Spring ApplicationContext.
+
+
+2. Difference Between HTTP Request and HTTP Session
+
+HTTP Request:
+Definition:
+A single call from a client (browser, app, etc.) to the server, such as loading a page or submitting a form.
+Scope:
+Lasts only as long as the server is processing that one request.
+Spring Scope:
+Beans with @Scope("request") are created new for each HTTP request.
+Example Use:
+Tracking data for a single page load or form submission.
+
+HTTP Session:
+Definition:
+A series of requests from the same user/client, grouped together by the server to maintain state (like login status) across multiple requests.
+Scope:
+Lasts as long as the user is interacting with the application (until they log out or the session times out).
+Spring Scope:
+Beans with @Scope("session") are created once per user session and shared across all requests in that session.
+Example Use:
+Storing user login information, shopping cart contents, or preferences.
+
+Summary Table:
+
+Feature	                     HTTP Request	                 HTTP Session
+
+Lifetime	                 One client-server interaction	 Multiple interactions (user session)
+Scope	                     Short (milliseconds/seconds)	 Longer (minutes/hours)
+Spring Scope	             @Scope("request")	             @Scope("session")
+Use Case	                 Per-request data	             Per-user data across requests
+
+

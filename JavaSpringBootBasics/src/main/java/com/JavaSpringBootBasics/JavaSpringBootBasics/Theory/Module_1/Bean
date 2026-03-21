@@ -1,0 +1,20 @@
+What is Bean?
+
+Definition: In Spring, a Bean is simply an object that is managed by the Spring IoC
+(Inversion of Control) container. It's entire lifecycle is managed by Spring IOC container.
+
+How to define a Bean:
+
+1.Using annotations:
+Ex:
+
+@Component
+public class UserService { }
+
+//Also
+@Service
+public class UserService { }
+
+2.Earlier days , we defined using xml:
+<bean id="userService" class="com.example.UserService"/>
+

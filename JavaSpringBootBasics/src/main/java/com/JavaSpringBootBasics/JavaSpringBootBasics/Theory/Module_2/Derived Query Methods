@@ -1,0 +1,34 @@
+1. Derived Query Methods by Naming Strategies
+
+Theory
+Spring Data JPA lets you create queries just by naming your repository methods in a certain way.
+It parses the method name and generates the SQL/JPQL for you.
+
+Common Naming Patterns
+
+Comparison:
+findByAgeGreaterThan(int age) → Finds entities where age > given value.
+
+Case-insensitive:
+findByNameIgnoreCase(String name) → Ignores case when matching name.
+
+Logical operators:
+findByNameAndStatus(String name, Status status) → Combines conditions.
+
+Ordering:
+findByStatusOrderByAgeDesc(Status status) → Orders results.
+
+Implementation
+Repository Example:
+
+public interface UserRepository extends JpaRepository<User, Long> {
+    List<User> findByAgeGreaterThan(int age);
+    List<User> findByNameIgnoreCase(String name);
+    List<User> findByStatusOrderByAgeDesc(Status status);
+}
+
+Usage:
+
+List<User> adults = userRepository.findByAgeGreaterThan(18);
+List<User> namedJohn = userRepository.findByNameIgnoreCase("john");
+List<User> sorted = userRepository.findByStatusOrderByAgeDesc(Status.ACTIVE);

@@ -1,0 +1,142 @@
+What the Client Sees:
+
+When your Spring controller returns a ResponseEntity, the client receives:
+
+HTTP Status Code:
+
+Example: 200 OK, 201 Created, 404 Not Found
+
+Response Headers
+Example:
+
+X-Custom-Header: CustomValue
+Content-Type: application/json
+
+Response Body
+Example (JSON):
+
+{
+  "id": 1,
+  "name": "Alice",
+  "email": "alice@example.com"
+}
+
+Example: GET /users/1
+Suppose your controller returns:
+
+return ResponseEntity.ok()
+    .header("X-Custom-Header", "CustomValue")
+    .body(user);
+
+In Postman or curl, you’ll see:
+
+Status:
+200 OK
+
+Headers:
+
+X-Custom-Header: CustomValue
+Content-Type: application/json
+
+Body:
+
+{
+  "id": 1,
+  "name": "Alice",
+  "email": "alice@example.com"
+}
+
+Example: User Not Found
+
+If your controller returns:
+return ResponseEntity.notFound().build();
+
+Status:
+404 Not Found
+
+Headers:
+
+Content-Length: 0
+
+Body:
+(empty)
+
+Example: POST /users
+If your controller returns:
+
+return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+
+Status:
+201 Created
+Headers:
+
+Content-Type: application/json
+
+Body:
+
+{
+  "id": 2,
+  "name": "Bob",
+  "email": "bob@example.com"
+}
+
+Summary
+
+(i) The client sees the status code, headers, and body exactly as you set them in
+ ResponseEntity.
+(ii) Custom headers are visible in the response headers section.
+(iii) The body is shown as JSON (or XML) in the response body.
+(iv) Status codes help the client know if the request was successful, failed, or created
+something new.
+
+This is how ResponseEntity gives you full control over what the client receives [1] [2].
+
+
+
+Q.What are Headers?
+
+Headers in HTTP responses (and requests) are key-value pairs that provide extra information
+about the communication between the client and server. They are not part of the main data
+(body), but help both sides understand how to handle the data, connection, or request.
+
+What Do Headers Indicate?
+Metadata about the response or request:
+Headers can describe the content type, length, encoding, authentication, caching, and more.
+
+How to process the body:
+For example, Content-Type: application/json tells the client that the body is JSON.
+
+Control behavior:
+Headers can instruct the client or server to cache, redirect, or authenticate.
+
+Common Response Headers
+
+Content-Type:
+Indicates the format of the response body (e.g., JSON, XML, HTML).
+Content-Type: application/json
+
+Content-Length:
+Size of the response body in bytes.
+Content-Length: 123
+
+Location:
+Used in 201 Created responses to show where the new resource is.
+Location: /users/2
+
+Custom Headers:
+You can add your own headers for extra info.
+X-Custom-Header: CustomValue
+
+Cache-Control:
+Tells the client how to cache the response.
+Cache-Control: no-cache
+
+
+Why Are Headers Important?
+(i)   They help clients and servers understand how to handle the data.
+(ii)  They can carry authentication tokens, session info, or custom metadata.
+(iii) They make APIs more flexible and robust.
+
+In summary:
+Headers are like labels or instructions attached to your HTTP messages, helping both sides
+communicate more effectively

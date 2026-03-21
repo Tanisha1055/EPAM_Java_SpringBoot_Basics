@@ -1,0 +1,91 @@
+Richardson Maturity Model (Simple Explanation)
+
+It’s a way to measure how “RESTful” your API is. There are four levels (0–3). The higher the
+level, the better your API follows REST rules.
+
+Level 0: One Endpoint, One Method
+
+(i)   You have just one URL for everything.
+(ii)  You use only POST (or GET).
+(iii) You send a big request with an “action” field telling the server what to do.
+
+Example:
+POST /api
+{ "action": "getUser", "userId": 123 }
+
+Why it’s not good:
+
+(i) Doesn’t use HTTP features.
+(ii) Hard to understand and maintain.
+
+Level 1: Resources
+
+(i) You create URLs for different things (resources), like /users or /products.
+(ii) But you still use only POST for all actions.
+
+Example:
+POST /users
+{ "action": "create", "name": "Alice" }
+
+Better, but:
+
+Still not using HTTP methods properly.
+
+Level 2: HTTP Methods
+
+You use different HTTP methods for different actions:
+
+a.GET for getting data
+b.POST for creating
+c.PUT for updating
+d.DELETE for deleting
+URLs represent resources.
+
+Example:
+GET /users/123 (Get user 123)
+POST /users (Create a user)
+PUT /users/123 (Update user 123)
+DELETE /users/123 (Delete user 123)
+
+Why it’s good:
+
+(i) Uses HTTP as it was meant to be used.
+(ii) Easier for others to understand and use.
+
+Level 3: Hypermedia (HATEOAS)
+
+(i) Your API responses include links to other actions.
+(ii) Clients can discover what they can do next by following links in the response.
+
+Example:
+When you get a user, the response includes links to update or delete that user:
+
+{
+  "id": 123,
+  "name": "Alice",
+  "links": [
+    { "rel": "self", "href": "/users/123" },
+    { "rel": "update", "href": "/users/123" },
+    { "rel": "delete", "href": "/users/123" }
+  ]
+}
+
+Why it’s best:
+
+(i) Clients don’t need to know all URLs ahead of time.
+(ii) Makes your API flexible and easy to use.
+
+Why Should You Care?
+a. Level 2 is what most good APIs use. It’s standard, easy, and powerful.
+b. Level 3 is even better, but not always needed for simple APIs.
+c. Higher levels make your API easier to use, more reliable, and more compatible with web
+tools.
+
+
+Interview Tip
+If asked, explain:
+
+Level 0: One endpoint, one method, action in request.
+Level 1: Multiple endpoints for resources, but still one method.
+Level 2: Multiple endpoints, proper HTTP methods.
+Level 3: Responses include links to other actions (hypermedia).

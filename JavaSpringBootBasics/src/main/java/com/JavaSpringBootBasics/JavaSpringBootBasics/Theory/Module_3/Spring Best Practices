@@ -1,0 +1,105 @@
+1. Properly Designing RESTful APIs
+
+a. Resource URIs:
+
+(i) Use nouns, not verbs, for resource names.
+Good: /users, /orders/123
+Bad: /getUser, /createOrder
+
+(ii) Use plural nouns for collections.
+/users (all users), /users/1 (user with ID 1)
+
+(iii) Hierarchical relationships in URIs.
+/users/1/orders (orders for user 1)
+
+b. HTTP Verbs (Methods)
+
+GET: Retrieve data (safe, no side effects)
+GET /users (get all users)
+GET /users/1 (get user with ID 1)
+POST: Create a new resource
+POST /users (create a new user)
+PUT: Update/replace a resource
+PUT /users/1 (replace user 1)
+PATCH: Partially update a resource
+PATCH /users/1 (update some fields of user 1)
+DELETE: Remove a resource
+DELETE /users/1 (delete user 1)
+
+Example Controller:
+
+@RestController
+@RequestMapping("/users")
+public class UserController {
+    @GetMapping public List<User> getAllUsers() { ... }
+    @GetMapping("/{id}") public User getUser(@PathVariable Long id) { ... }
+    @PostMapping public User createUser(@RequestBody User user) { ... }
+    @PutMapping("/{id}") public User updateUser(@PathVariable Long id, @RequestBody User user) { ... }
+    @DeleteMapping("/{id}") public void deleteUser(@PathVariable Long id) { ... }
+}
+
+2. Avoiding Anti-Patterns
+
+(i) Don’t use GET for actions that modify data.
+Bad: GET /users/delete/1
+Good: DELETE /users/1
+
+(ii) Don’t use verbs in URIs.
+Bad: /getUser, /updateUser
+Good: /users/1
+
+(iii) Don’t expose internal database structure.
+Avoid URIs like /users_table
+
+(iv) Don’t use complex query parameters for actions.
+Bad: GET /users?action=delete&id=1
+Good: DELETE /users/1
+
+(v) Don’t return 200 OK for errors.
+Use proper status codes (404 for not found, 400 for bad request, etc.)
+
+3. Structuring APIs to Conform to REST Standards & Richardson Maturity Model
+
+a. Richardson Maturity Model Levels
+
+Level 0: One endpoint, one method (not RESTful)
+Level 1: Multiple endpoints for resources, but only one method (e.g., POST)
+Level 2: Multiple endpoints, proper use of HTTP methods (GET, POST, PUT, DELETE)
+Level 3: Hypermedia controls (HATEOAS) — include links in responses
+
+Aim for at least Level 2 for most APIs.
+
+b. RESTful API Structure
+
+(i) Use standard HTTP status codes.
+200 OK (success), 201 Created (resource created), 204 No Content (deleted), 400 Bad Request,
+404 Not Found, 500 Internal Server Error
+
+(ii) Use proper content types.
+Content-Type: application/json
+Support filtering, sorting, and pagination via query parameters.
+/users?page=1&size=10&sort=name,asc
+
+(iii) Version your API if needed.
+/api/v1/users
+
+4. Practical Examples
+
+Good URI Design
+/users (GET, POST)
+/users/1 (GET, PUT, PATCH, DELETE)
+/users/1/orders (GET all orders for user 1)
+
+Bad URI Design
+/getUser?id=1
+/users/delete/1
+/users_table
+
+Proper Status Codes
+
+@GetMapping("/{id}")
+public ResponseEntity<User> getUser(@PathVariable Long id) {
+    return userRepository.findById(id)
+        .map(ResponseEntity::ok)
+        .orElse(ResponseEntity.notFound().build());
+}

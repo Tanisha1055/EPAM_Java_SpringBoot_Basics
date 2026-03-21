@@ -1,0 +1,157 @@
+1. What is Spring Security?
+
+Theory: Spring Security is a powerful and customizable framework for securing Java
+applications, especially those built with Spring. It provides mechanisms for authentication
+(verifying user identity) and authorization (controlling access to resources based on user
+roles or permissions). It’s widely used to protect REST APIs and web applications from
+unauthorized access, attacks, and data leaks.
+
+Key Features:
+
+Authentication: Who are you?
+Authorization: What are you allowed to do?
+Protection against common attacks: CSRF, XSS, session fixation, etc.
+Integration with various authentication providers (database, LDAP, OAuth, JWT, etc.)
+
+Implementation: To use Spring Security, add the dependency:
+
+<!-- Maven -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-security</artifactId>
+</dependency>
+By default, Spring Security secures all endpoints and provides a basic login form. You can
+customize authentication and authorization rules using configuration classes.
+
+2. How does Spring Security provide authentication and authorization?
+
+Theory:
+Authentication: Spring Security checks user credentials (username/password, token, etc.)
+against a configured provider (in-memory, database, etc.).
+Authorization: After authentication, it checks if the user has the required roles/permissions
+to access a resource.
+
+
+Implementation: You can configure authentication and authorization in a SecurityConfig class:
+
+@EnableWebSecurity
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+            .authorizeRequests()
+                .antMatchers("/admin/**").hasRole("ADMIN") // Authorization
+                .antMatchers("/user/**").hasAnyRole("USER", "ADMIN")
+                .anyRequest().authenticated()
+            .and()
+            .httpBasic(); // Authentication method
+    }
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.inMemoryAuthentication()
+            .withUser("user").password("{noop}password").roles("USER")
+            .and()
+            .withUser("admin").password("{noop}admin").roles("ADMIN");
+    }
+}
+
+httpBasic() enables HTTP Basic authentication.
+antMatchers restricts access based on roles.
+
+
+3. Why secure REST APIs?
+Theory: REST APIs are often exposed over HTTP and can be accessed from anywhere. Securing
+them is crucial to:
+
+Prevent unauthorized access to sensitive data.
+Protect user information during communication.
+Ensure only authenticated and authorized users can perform actions.
+
+
+Implementation: Spring Security can secure REST APIs by requiring authentication for all
+endpoints and using HTTPS for encrypted communication. You can also use tokens (JWT) for
+stateless authentication.
+
+4. Authentication vs Authorization
+
+Theory:
+
+Authentication: The process of verifying who a user is (e.g., login with username/password).
+Authorization: The process of determining what an authenticated user is allowed to do (e.g.,
+access admin panel).
+
+Example:
+Authentication: “Are you John?”
+Authorization: “Is John allowed to access /admin?”
+
+5. HTTP Basic vs Bearer Token Authentication
+
+Theory:
+
+HTTP Basic Authentication:
+Sends username and password with every request (encoded in Base64).
+Simple, but credentials are exposed if not using HTTPS.
+Suitable for simple scenarios or internal APIs.
+
+
+Bearer Token Authentication (e.g., JWT):
+
+Client authenticates once, receives a token (JWT).
+Token is sent in the Authorization header for subsequent requests.
+More secure and scalable, suitable for stateless REST APIs.
+
+
+Implementation:
+
+HTTP Basic:
+
+http.httpBasic();
+
+Client sends:
+
+Authorization: Basic base64(username:password)
+
+Bearer Token (JWT):
+
+Implement a filter to validate JWT tokens.
+
+Example (simplified):
+
+http
+    .authorizeRequests()
+        .anyRequest().authenticated()
+    .and()
+    .addFilter(new JwtAuthenticationFilter(authenticationManager()));
+
+
+Client sends:
+
+Authorization: Bearer <token>
+
+
+6. Practical Example: Securing a REST API
+
+Step 1: Add Spring Security dependency
+
+Step 2: Configure Security
+
+@EnableWebSecurity
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+            .csrf().disable() // For REST APIs
+            .authorizeRequests()
+                .antMatchers("/public/**").permitAll()
+                .antMatchers("/private/**").authenticated()
+            .and()
+            .httpBasic(); // Or use JWT for Bearer Token
+    }
+}
+
+
+Step 3: Implement JWT Authentication (for Bearer Token)
+
+Use libraries like jjwt or Spring Security’s JWT support.
+Create a filter to validate tokens.

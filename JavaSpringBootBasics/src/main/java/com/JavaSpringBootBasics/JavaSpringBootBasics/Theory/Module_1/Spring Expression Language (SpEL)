@@ -1,0 +1,68 @@
+1. What is Spring Expression Language (SpEL)?
+
+SpEL is a powerful expression language in Spring that allows you to query and manipulate
+objects at runtime.
+You can use SpEL in annotations, XML, or Java code to inject values, perform calculations,
+access bean properties, and more.
+
+You can use SpEL to reference and inject values from other beans or properties.
+
+2. Accessing Bean Properties with SpEL:
+
+@Component
+public class UserService {
+    @Value("#{appConfig.appName}")
+    private String applicationName;
+}
+
+Here, #{appConfig.appName} accesses the appName property of the appConfig bean.
+
+3. Conditional Expressions with SpEL:
+
+SpEL supports conditional logic, similar to the ternary operator in Java.
+
+@Value("#{systemProperties['user.country'] == 'US' ? 'Hello' : 'Hola'}")
+private String greeting;
+
+If the system property user.country is US, greeting will be "Hello", otherwise "Hola".
+
+4. Calculations with SpEL:
+
+You can perform arithmetic operations directly in SpEL expressions.
+
+@Value("#{2 * 3 + 4}")
+private int result; // result = 10
+
+You can also use bean properties in calculations:
+
+@Component
+public class DiscountConfig {
+    public int getDiscount() { return 5; }
+}
+
+@Component
+public class OrderService {
+    @Value("#{100 - discountConfig.discount}")
+    private int finalPrice; // finalPrice = 95
+}
+
+5. Using SpEL with the @Value Annotation
+The @Value annotation is the most common way to use SpEL for injecting values into fields,
+methods, or constructor parameters.
+
+Syntax:
+
+For SpEL: @Value("#{expression}")
+For property placeholders: @Value("${property.name}")
+
+Examples:
+
+Injecting a property:
+
+@Value("#{appConfig.appName}")
+private String appName;
+
+Injecting a system property:
+
+@Value("#{systemProperties['user.home']}")
+private String userHome;

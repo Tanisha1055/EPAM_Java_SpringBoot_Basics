@@ -1,0 +1,53 @@
+1. Extending Repository Interfaces
+
+Spring Data JPA provides several repository interfaces you can extend to get different sets
+of functionality:
+
+a. CrudRepository<T, ID>
+Basic CRUD operations (Create, Read, Update, Delete).
+
+Example:
+public interface UserRepository extends CrudRepository<User, Long> {}
+
+b. PagingAndSortingRepository<T, ID>
+Adds pagination and sorting to CRUD operations.
+
+Example:
+public interface UserRepository extends PagingAndSortingRepository<User, Long> {}
+
+c. JpaRepository<T, ID>
+Extends both above and adds JPA-specific features (like batch operations, flush, etc.).
+Most commonly used in Spring Boot projects.
+
+Example:
+public interface UserRepository extends JpaRepository<User, Long> {}
+
+Best Practice:
+Use JpaRepository unless you have a specific reason to use the others.
+
+2. Default CRUD Methods
+When you extend these interfaces, you get a set of ready-to-use methods:
+
+Method	                                         Description
+
+save(entity)	                                 Save or update an entity
+findById(id)	                                 Find entity by primary key
+findAll()	                                     Get all entities
+delete(entity)	                                 Delete an entity
+deleteById(id)	                                 Delete by primary key
+count()	                                         Count total entities
+existsById(id)	                                 Check if entity exists by primary key
+
+Example Usage:
+
+@Autowired
+private UserRepository userRepository;
+
+User user = new User("Alice");
+userRepository.save(user);
+
+Optional<User> found = userRepository.findById(1L);
+
+userRepository.deleteById(1L);
+
+long total = userRepository.count();

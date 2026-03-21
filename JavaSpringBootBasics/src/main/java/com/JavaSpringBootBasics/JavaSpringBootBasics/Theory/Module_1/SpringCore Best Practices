@@ -1,0 +1,118 @@
+Best Practices include:
+
+1. Designing Loosely Coupled Architectures Using IoC and DI
+
+Theory
+Loose coupling means components (classes, services, etc.) depend on abstractions (interfaces)
+rather than concrete implementations.
+Inversion of Control (IoC): The control of object creation and wiring is handed over to the
+Spring container.
+Dependency Injection (DI): Spring injects dependencies into your classes, rather than your
+classes creating them.
+
+Implementation
+Use interfaces for dependencies:
+
+public interface NotificationService {
+    void send(String message);
+}
+
+@Service
+public class EmailNotificationService implements NotificationService {
+    public void send(String message) { /* ... */ }
+}
+
+Inject dependencies via constructor (preferred):
+
+@Service
+public class UserService {
+    private final NotificationService notificationService;
+
+    @Autowired
+    public UserService(NotificationService notificationService) {
+        this.notificationService = notificationService;
+    }
+}
+
+Benefits:
+Easy to swap implementations (e.g., switch from email to SMS).
+Easier to test (can inject mocks or stubs).
+Code is more modular and maintainable.
+
+2. Writing Testable and Maintainable Code with Spring Core
+
+Theory
+Testable code is code that can be easily unit tested.
+Maintainable code is code that is easy to understand, modify, and extend.
+
+Implementation
+Constructor injection makes it easy to inject mock dependencies for testing.
+
+@Test
+public void testUserService() {
+    NotificationService mockService = Mockito.mock(NotificationService.class);
+    UserService userService = new UserService(mockService);
+    // test logic...
+}
+Use @Profile for test-specific beans:
+
+@Service
+@Profile("test")
+public class MockNotificationService implements NotificationService {
+    public void send(String message) { /* mock logic */ }
+}
+
+Keep beans small and focused (Single Responsibility Principle).
+Use @Qualifier to resolve ambiguity when multiple beans of the same type exist.
+
+
+3. Avoiding Common Pitfalls
+
+a. Circular Dependencies
+What is it?
+When two or more beans depend on each other, causing a loop (e.g., A depends on B, B depends
+on A).
+Why is it bad?
+Spring cannot resolve the dependencies and will throw an error.
+
+How to avoid:
+Rethink your design—break the cycle by introducing an interface or event.
+Use setter injection if absolutely necessary (not recommended for required dependencies).
+
+Example of a circular dependency:
+
+@Component
+public class A {
+    @Autowired
+    private B b;
+}
+
+@Component
+public class B {
+    @Autowired
+    private A a;
+}
+
+Solution:
+Refactor so that only one depends on the other, or use events/callbacks.
+
+b. Excessive Dependencies
+
+What is it?
+When a class depends on too many other classes (sometimes called a "God object").
+Why is it bad?
+Hard to test, maintain, and understand.
+
+How to avoid:
+Apply the Single Responsibility Principle: each class should have one reason to change.
+Split large classes into smaller, focused ones.
+Limit the number of constructor parameters (ideally 3-5).
+
+c. Field Injection
+
+Why avoid?
+Harder to test (can’t inject mocks easily).
+Hides dependencies (not visible in constructor).
+
+Best practice:
+Use constructor injection for required dependencies.

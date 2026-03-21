@@ -1,0 +1,70 @@
+5. Projection Queries and DTO-based Results
+
+Why use projections?
+Sometimes you don’t need the whole entity—just a few fields.
+Projections let you fetch only what you need, making queries faster and reducing data
+transfer.
+
+Sometimes you want to fetch only specific fields, not the whole entity. This is called a
+projection.
+
+a. Interface-based Projection
+
+How does it work?
+You create an interface with getter methods for the fields you want. Spring Data JPA
+will automatically map the query result to this interface.
+
+Ex:
+
+public interface UserNameOnly {
+    String getName();
+}
+
+List<UserNameOnly> findByStatus(Status status);
+
+Info:
+This will return a list of objects with only the name field populated.
+When to use: For simple projections (few fields, no logic).
+Returns only the name field for each user.
+
+b. DTO-based Projection
+
+What is a DTO?
+DTO stands for Data Transfer Object—a simple class used to carry data, often between
+layers of an application.
+
+How does it work?
+You create a class with a constructor for the fields you want, then use a JPQL constructor
+expression.
+
+Ex:
+
+Create a DTO (Data Transfer Object):
+
+public class UserDTO {
+    private String name;
+    private String email;
+    public UserDTO(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
+    // getters
+}
+
+Use a constructor expression in JPQL:
+
+@Query("SELECT new com.example.UserDTO(u.name, u.email) FROM User u WHERE u.status = :status")
+List<UserDTO> findUserDTOByStatus(@Param("status") Status status);
+
+Info:
+This returns a list of UserDTO objects, each containing only name and email.
+When to use: For more complex projections, or when you need to add logic or combine fields.
+
+Feature	                     When to Use	                   Example
+
+Query Derivation	        Simple queries	                   findByEmail(String email)
+@Query (JPQL)	            Complex, object-oriented queries   JPQL with entity fields
+@Query (Native SQL)	        DB-specific or legacy queries	   SQL with table/column names
+Interface Projection	    Simple, few fields	               UserNameOnly interface
+DTO Projection	            Custom data shapes, logic,         UserDTO class
+                            multiple fields

@@ -1,0 +1,77 @@
+What is Circular Dependency?
+A circular dependency occurs when two or more beans depend on each other directly or indirectly,
+forming a loop.
+
+Example:
+
+Bean A depends on Bean B
+Bean B depends on Bean A
+This causes Spring to fail during bean creation, as it cannot resolve which bean to instantiate
+first.
+
+How to Avoid Circular Dependency
+
+1. Refactor Your Design
+Break the cycle:
+Rethink your architecture so that beans don’t depend on each other directly.
+Use interfaces or abstraction to decouple logic.
+Move shared logic to a third bean that both depend on.
+
+Example:
+
+@Component
+public class NotificationService { /* ... */ }
+
+@Component
+public class UserService {
+    private final NotificationService notificationService;
+    public UserService(NotificationService notificationService) { /* ... */ }
+}
+
+Here, both services are independent, or depend on a common bean, not each other.
+2. Use Setter Injection (Only if Necessary)
+Setter injection can help break the cycle, as Spring can create beans first and inject
+dependencies later.
+Note: This is a workaround, not a recommended solution for required dependencies.
+
+Example:
+
+@Component
+public class A {
+    private B b;
+    @Autowired
+    public void setB(B b) { this.b = b; }
+}
+
+@Component
+public class B {
+    private A a;
+    @Autowired
+    public void setA(A a) { this.a = a; }
+}
+This allows Spring to instantiate both beans before wiring them.
+3. Use Events or Callbacks
+Instead of direct dependencies, use Spring’s event mechanism or callbacks to communicate
+between beans.
+
+Example:
+
+Bean A publishes an event.
+Bean B listens for the event and reacts.
+4. Re-examine Responsibilities
+If two beans depend on each other, they may be doing too much.
+Split responsibilities into smaller, focused beans.
+5. Use @Lazy Annotation (Advanced)
+You can use @Lazy to defer bean creation until it’s actually needed, which can help in rare
+cases.
+
+Example:
+
+@Component
+public class A {
+    @Autowired
+    @Lazy
+    private B b;
+}
+
+This is a last resort and not recommended for most designs.

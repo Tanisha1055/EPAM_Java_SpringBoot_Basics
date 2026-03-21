@@ -1,0 +1,95 @@
+Why is Student the Owning Entity?
+
+In JPA, for every relationship, one side must be the "owning" side and the other is the
+"inverse" (or "mappedBy") side.
+This is necessary so JPA knows which entity is responsible for managing the relationship
+in the database (i.e., which side will update the join table).
+
+In your example:
+
+@Entity
+public class Student {
+    @ManyToMany
+    @JoinTable(
+        name = "student_course",
+        joinColumns = @JoinColumn(name = "student_id"),
+        inverseJoinColumns = @JoinColumn(name = "course_id")
+    )
+    private Set<Course> courses;
+}
+
+@Entity
+public class Course {
+    @ManyToMany(mappedBy = "courses")
+    private Set<Student> students;
+}
+
+
+Student is the owning side because:
+The @JoinTable annotation is on the Student entity.
+The Student entity defines how the join table is mapped.
+The Course entity uses mappedBy = "courses", which tells JPA that it is the inverse side and
+the mapping is controlled by the Student entity.
+
+What does "owning side" mean?
+The owning side is the side that controls the relationship and is responsible for updating
+the join table.
+Only changes made through the owning side are persisted in the join table.
+The inverse side is just a mirror; it reflects the relationship but does not control it.
+
+Why do we need an owning side?
+To avoid confusion and data inconsistency, JPA requires one side to be responsible for
+managing the relationship.
+This prevents both entities from trying to update the join table independently, which could
+lead to conflicts.
+
+How to decide which is the owning side?
+It’s up to you as the developer. Usually, you pick the side that makes the most sense for
+your business logic or the side you’ll use most often to manage the relationship.
+The owning side is the one without the mappedBy attribute.
+
+Summary Table
+
+Entity	                    Annotation Details	                       Role
+
+Student	                    @ManyToMany + @JoinTable	               Owning side
+Course	                    @ManyToMany(mappedBy = "courses")	       Inverse side
+
+In short:
+
+The owning side is the one that defines the @JoinTable and manages the join table.
+The inverse side uses mappedBy to point to the owning side’s field.
+In your example, Student is the owning side because it defines the join table mapping.
+
+
+What Does "FK to Student" Mean in the Join Table?
+
+When we say "FK to Student" in the context of the join table, we mean:
+In the join table (student_course), the column student_id is a foreign key that points to the
+primary key (id) in the Student table.
+Similarly, course_id is a foreign key in the join table that points to the primary key (id)
+in the Course table.
+It does NOT mean that the Student entity has a foreign key to the Course table, or vice versa.
+The foreign keys exist only in the join table, not in the main entity tables.
+
+
+Q.What Does mappedBy = "courses" Mean?
+
+In a bidirectional relationship, one side is the "owning side" (which manages the relationship
+and the join table), and the other is the "inverse side" (which just reflects the relationship).
+The mappedBy attribute tells JPA that this side is not the owner; instead, the relationship is
+managed by the field named "courses" in the other entity (Student).
+
+Explanation of a Topic:
+
+Student is the owning side because it defines the @JoinTable and manages the relationship.
+
+The courses field in Student is a set of all the courses a student is enrolled in.
+When you add or remove a course from a student’s courses set, JPA updates the join table
+accordingly.
+Course is the inverse side because it uses mappedBy = "courses".
+
+The students field in Course is a set of all students enrolled in that course.
+This field is mapped by the courses field in Student, meaning it reflects the relationship
+but does not manage the join table.
+JPA knows to look at the courses field in Student to understand and manage the relationship.

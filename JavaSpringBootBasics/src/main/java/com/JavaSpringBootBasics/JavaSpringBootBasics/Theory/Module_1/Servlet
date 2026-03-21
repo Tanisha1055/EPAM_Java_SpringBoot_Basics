@@ -1,0 +1,45 @@
+🔹 What is a Servlet?
+
+A Servlet is a Java class that:
+
+Handles HTTP requests
+Processes them
+Sends back HTTP responses
+
+It runs inside a web server like:
+Apache Tomcat
+Jetty
+
+Behind the scenes:
+
+Browser sends HTTP request
+Server receives it
+Servlet processes it
+Servlet sends response back
+
+Spring Boot runs on a servlet container like:
+👉 Apache Tomcat (embedded)
+
+And Spring uses a special servlet called:
+👉 DispatcherServlet
+
+This servlet:
+
+Receives all HTTP requests
+Decides which controller method to call
+Sends response back
+
+So even if you don’t see it, servlet is always there.
+
+A servlet container:
+
+Manages servlet lifecycle
+Handles request routing
+Manages threads
+Manages sessions
+Ex: Apache Tomcat
+
+Browser → asks for data
+Servlet → acts like receptionist
+Database → data storage
+

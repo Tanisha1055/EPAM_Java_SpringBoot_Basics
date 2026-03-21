@@ -1,0 +1,67 @@
+What is a DTO?
+
+A DTO (Data Transfer Object) is a simple Java class used to transfer data between layers of
+an application, especially between the backend and the client in REST APIs. DTOs usually
+contain only fields and getters/setters, without business logic.
+
+Why use DTOs?
+
+(i)   To control what data is exposed to the client (e.g., hide sensitive fields).
+(ii)  To shape the response format (e.g., combine fields, rename properties).
+(iii) To decouple your internal entity structure from the API contract.
+
+
+How Does Java Map Entities to DTOs?
+Java does not automatically map entities to DTOs. You need to manually convert (map) your
+entity objects to DTOs, or use libraries like MapStruct or ModelMapper to automate this
+process.
+
+Serialization
+When you return a DTO from a Spring REST controller, Spring (using Jackson by default)
+serializes the DTO object to JSON (or XML) for the HTTP response. Serialization means
+converting the Java object into a format (like JSON) that can be sent over the network.
+
+Example:
+
+public class UserDTO {
+    private String name;
+    private String email;
+    // getters and setters
+}
+
+Manual Mapping Example:
+
+public UserDTO toDTO(User user) {
+    UserDTO dto = new UserDTO();
+    dto.setName(user.getName());
+    dto.setEmail(user.getEmail());
+    return dto;
+}
+
+Controller Example:
+
+@GetMapping("/{id}")
+public ResponseEntity<UserDTO> getUser(@PathVariable Long id) {
+    User user = userRepository.findById(id).orElseThrow();
+    UserDTO dto = toDTO(user);
+    return ResponseEntity.ok(dto);
+}
+
+Automatic Mapping (Optional):
+
+You can use libraries like MapStruct or ModelMapper to automate the mapping process,
+reducing boilerplate code.
+
+Summary:
+A DTO is just a class for transferring data.
+Java does not automatically map entities to DTOs; you must do it manually or use a mapping
+library.
+Spring serializes the DTO to JSON for the API response.
+DTOs help control what data is exposed and keep your API contract stable.
+
+
+
+What is JSON?
+
+JSON stands for JavaScript Object Notation. It is a lightweight data-interchange format that
+is easy for humans to read and write, and easy for machines to parse and generate

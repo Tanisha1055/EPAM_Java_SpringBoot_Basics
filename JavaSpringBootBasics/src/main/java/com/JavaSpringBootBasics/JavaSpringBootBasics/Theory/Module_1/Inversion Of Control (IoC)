@@ -1,0 +1,28 @@
+IoC Overview: How Spring Handles Object Management :
+
+IoC (Inversion of Control) is a core principle in Spring. It means the control of creating
+and managing objects (beans) is transferred from your code to the Spring container. Instead
+of you instantiating classes with new, Spring creates, configures, and manages the lifecycle
+of objects for you.
+
+How it works:
+
+You define beans (Java objects) and their dependencies.
+Spring reads this configuration (via annotations or XML).
+Spring creates the beans and injects dependencies where needed.
+Benefits:
+
+Loose coupling between components.
+Easier testing and maintenance.
+Centralized configuration.
+
+Example:
+
+@Component
+public class UserService {
+    // Spring will inject UserRepository here
+    @Autowired
+    private UserRepository userRepository;
+}
+Here, you don’t create UserService or UserRepository manually—Spring does it for you.
+

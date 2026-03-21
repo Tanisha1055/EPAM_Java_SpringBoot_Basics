@@ -1,0 +1,139 @@
+1. What is CRUD in REST?
+
+CRUD stands for:
+
+Create (POST): Add a new resource.
+Read (GET): Retrieve existing resources.
+Update (PUT/PATCH): Modify existing resources.
+Delete (DELETE): Remove resources.
+
+In REST, each operation maps to an HTTP method and a URL pattern.
+
+2. Setting Up the Entity and Repository
+
+Example Entity: User
+
+@Entity
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+    private String email;
+
+    // getters and setters
+}
+
+Example Repository
+
+public interface UserRepository extends JpaRepository<User, Long> {
+    // JpaRepository provides all basic CRUD methods
+}
+
+
+3. Implementing REST Endpoints
+3.1. Create (POST)
+
+Use POST to create a new resource.
+The client sends the resource data in the request body.
+
+Implementation:
+
+@PostMapping("/users")
+public ResponseEntity<User> createUser(@RequestBody User user) {
+    User savedUser = userRepository.save(user);
+    return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
+}
+
+3.2. Read (GET)
+
+Theory:
+Use GET to retrieve resources.
+You can get all resources or a specific one by ID.
+
+Implementation:
+
+// Get
+ all users
+@GetMapping("/users")
+public List<User> getAllUsers() {
+    return userRepository.findAll();
+}
+
+// Get user by ID
+@GetMapping("/users/{id}")
+public ResponseEntity<User> getUserById(@PathVariable Long id) {
+    return userRepository.findById(id)
+        .map(user -> ResponseEntity.ok(user))
+        .orElse(ResponseEntity.notFound().build());
+}
+
+
+3.3. Update (PUT, PATCH)
+Theory:
+Use PUT to fully update a resource (replace all fields).
+Use PATCH to partially update a resource (only some fields).
+
+Implementation:
+
+// Full update with PUT
+@PutMapping("/users/{id}")
+public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User userDetails) {
+    return userRepository.findById(id)
+        .map(user -> {
+            user.setName(userDetails.getName());
+            user.setEmail(userDetails.getEmail());
+            User updatedUser = userRepository.save(user);
+            return ResponseEntity.ok(updatedUser);
+        })
+        .orElse(ResponseEntity.notFound().build());
+}
+
+// Partial update with PATCH (example: only email)
+@PatchMapping("/users/{id}")
+public ResponseEntity<User> updateUserEmail(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
+    return userRepository.findById(id)
+        .map(user -> {
+            if (updates.containsKey("email")) {
+                user.setEmail((String) updates.get("email"));
+            }
+            User updatedUser = userRepository.save(user);
+            return ResponseEntity.ok(updatedUser);
+        })
+        .orElse(ResponseEntity.notFound().build());
+}
+
+
+3.4. Delete (DELETE)
+Theory:
+
+Use DELETE to remove a resource by ID.
+Implementation:
+
+@DeleteMapping("/users/{id}")
+public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+    return userRepository.findById(id)
+        .map(user -> {
+            userRepository.delete(user);
+            return ResponseEntity.noContent().build();
+        })
+        .orElse(ResponseEntity.notFound().build());
+}
+4. How JpaRepository Helps
+
+** JpaRepository** provides all basic CRUD methods: save(), findAll(), findById(), delete(), etc.
+
+You don’t need to write SQL or custom queries for basic operations.
+You can extend it with custom queries if needed.
+
+
+5. Summary Table
+
+Operation	      HTTP Method	URL Pattern	   Controller Annotation	  Repository Method
+
+Create	          POST	       /users	       @PostMapping	                save()
+Read All	      GET	       /users	       @GetMapping	                findAll()
+Read One	      GET	       /users/{id}	   @GetMapping("/{id}")	        findById()
+Update	          PUT/PATCH	   /users/{id}	   @PutMapping/@PatchMapping	save()
+Delete	          DELETE	   /users/{id}	   @DeleteMapping	            delete()

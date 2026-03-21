@@ -1,0 +1,37 @@
+ Custom Init and Destroy Methods:
+
+You can specify custom initialization and destruction methods in your bean definition (especially with Java-based config).
+Example:
+
+@Bean(initMethod = "customInit", destroyMethod = "customDestroy")
+public EmailService emailService() {
+    return new EmailService();
+}
+
+public class EmailService {
+    public void customInit() { /* custom initialization */ }
+    public void customDestroy() { /* custom cleanup */ }
+}
+
+
+b. BeanPostProcessor:
+Purpose: Allows you to add custom logic before and after Spring initializes any bean.
+How it works: Implement the BeanPostProcessor interface and override its methods.
+Example:
+
+@Component
+public class CustomBeanPostProcessor implements BeanPostProcessor {
+    @Override
+    public Object postProcessBeforeInitialization(Object bean, String beanName) {
+        // logic before initialization
+        return bean;
+    }
+
+    @Override
+    public Object postProcessAfterInitialization(Object bean, String beanName) {
+        // logic after initialization
+        return bean;
+    }
+}
+
+Use case: Logging, proxying, or modifying beans during their lifecycle.

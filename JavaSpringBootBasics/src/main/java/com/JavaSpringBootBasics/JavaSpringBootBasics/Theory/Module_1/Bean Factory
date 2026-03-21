@@ -1,0 +1,12 @@
+BeanFactory :
+
+Definition: BeanFactory is the root interface for accessing the Spring container.
+Role: It is responsible for instantiating, configuring, and managing beans.
+Usage: It is lightweight and used for simple scenarios, but not commonly used in modern Spring applications.
+Example:
+
+BeanFactory factory = new XmlBeanFactory(new FileSystemResource("beans.xml"));
+UserService userService = (UserService) factory.getBean("userService");
+
+
+Note: BeanFactory is lazy-initialized (beans are created only when requested).

@@ -1,0 +1,97 @@
+Q.What are Spring Profiles?
+
+Spring Profiles allow you to define different configurations for different environments
+(like development, testing, production) within the same application codebase. This helps you
+avoid hardcoding environment-specific values and makes your application more flexible and
+maintainable.
+
+Why use profiles?
+
+You can have different beans, properties, or configurations for each environment.
+You avoid manual changes when moving your app from dev to prod.
+2. Environment-Specific Configurations
+You can create beans or configuration files that are only loaded for a specific environment.
+
+Example:
+Suppose you have two different data sources: one for development and one for production.
+
+
+@Configuration
+public class DataSourceConfig {
+
+    @Bean
+    @Profile("dev")
+    public DataSource devDataSource() {
+        // return a datasource for development
+    }
+
+    @Bean
+    @Profile("prod")
+    public DataSource prodDataSource() {
+        // return a datasource for production
+    }
+}
+
+Only the bean matching the active profile will be created.
+
+3. Activating Profiles
+You can activate a profile in several ways:
+
+a. Using application.properties or application.yml
+properties
+
+spring.profiles.active=dev
+
+or
+
+yaml
+
+spring:
+  profiles:
+    active: dev
+b. Using Command Line
+bash
+
+
+java -jar myapp.jar --spring.profiles.active=prod
+c. Using Environment Variables
+bash
+
+
+export SPRING_PROFILES_ACTIVE=prod
+d. Programmatically
+java
+
+
+ConfigurableApplicationContext ctx = new SpringApplicationBuilder(MyApp.class)
+    .profiles("dev")
+    .run(args);
+4. Using the @Profile Annotation for Beans
+The @Profile annotation is used to indicate that a bean is only loaded for a specific profile.
+You can use it on classes or methods.
+Example on a class:
+
+@Service
+@Profile("test")
+public class TestEmailService implements EmailService {
+    // Only loaded when 'test' profile is active
+}
+
+Example on a method:
+
+@Bean
+@Profile("prod")
+public EmailService prodEmailService() {
+    return new SmtpEmailService();
+}
+5. Profile-Specific Properties Files
+You can also have different property files for each profile:
+
+application-dev.properties
+application-prod.properties
+
+Spring will automatically load the file matching the active profile.
+
+Example: If spring.profiles.active=dev, then application-dev.properties is loaded in addition
+to application.properties.
+

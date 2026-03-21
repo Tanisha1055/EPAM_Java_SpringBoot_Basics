@@ -1,0 +1,104 @@
+1. Core Stereotype Annotations
+These annotations tell Spring which classes to manage as beans and what their roles are in
+your application.
+
+a. @Component
+Purpose: Generic stereotype for any Spring-managed bean.
+Usage: Place on any class you want Spring to detect and manage.
+Example:
+
+@Component
+public class EmailSender {
+    // Spring will create and manage this bean
+}
+
+b. @Service
+Purpose: Specialization of @Component for service layer classes (business logic).
+Usage: Place on service classes to clarify their role.
+Example:
+
+@Service
+public class UserService {
+    // Business logic here
+}
+
+c. @Repository
+Purpose: Specialization of @Component for data access layer (DAO) classes.
+Extra Feature: Enables automatic exception translation for database errors.
+Usage: Place on classes that interact with the database.
+Example:
+
+@Repository
+public class UserRepository {
+    // Data access code here
+}
+
+
+d. @Controller
+Purpose: Specialization of @Component for web controllers (MVC pattern).
+Usage: Place on classes that handle HTTP requests.
+Example:
+
+@Controller
+public class UserController {
+    @GetMapping("/users")
+    public String listUsers(Model model) {
+        // Handle request and return view name
+        return "users";
+    }
+}
+
+2. Configuration Annotations
+These annotations help you define how beans are created, configured, and managed.
+
+a. @Configuration
+Purpose: Marks a class as a source of bean definitions.
+Usage: Use for Java-based configuration instead of XML.
+Example:
+java
+
+
+@Configuration
+public class AppConfig {
+    // Bean definitions go here
+}
+
+b. @Bean
+Purpose: Marks a method as a bean producer. The method’s return value is registered as a bean.
+Usage: Use inside @Configuration classes for explicit bean creation.
+Example:
+
+@Configuration
+public class AppConfig {
+    @Bean
+    public EmailSender emailSender() {
+        return new EmailSender();
+    }
+}
+
+c. @Scope
+Purpose: Defines the scope (lifetime and visibility) of a bean.
+Common scopes:
+"singleton" (default): One instance per Spring container.
+"prototype": New instance every time requested.
+"request": One per HTTP request (web apps).
+"session": One per HTTP session (web apps).
+
+Usage:
+
+@Component
+@Scope("prototype")
+public class UserSession {
+    // New instance for each request
+}
+
+d. @Lazy
+Purpose: Delays bean creation until it’s actually needed (lazy initialization).
+Usage: Use on beans that are expensive to create or not always needed.
+Example:
+
+@Component
+@Lazy
+public class ExpensiveService {
+    // Will only be created when first requested
+}

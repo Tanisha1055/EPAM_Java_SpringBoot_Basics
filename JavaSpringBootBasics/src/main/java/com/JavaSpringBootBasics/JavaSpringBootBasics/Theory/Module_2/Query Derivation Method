@@ -1,0 +1,136 @@
+3. Query Creation with Derived Methods
+
+Spring Data JPA can derive queries from method names. You don’t need to write SQL or JPQL
+for simple queries.
+
+Examples:
+
+List<User> findByName(String name);
+List<User> findByAgeGreaterThan(int age);
+long countByStatus(Status status);
+boolean existsByEmail(String email);
+
+How it works:
+Spring parses the method name and generates the query automatically.
+
+Common Keywords:
+
+findBy, readBy, getBy
+And, Or
+Between, LessThan, GreaterThan
+Like, Not, In, OrderBy, etc.
+
+Example:
+
+List<User> findByNameAndStatus(String name, Status status);
+Generates:
+SELECT * FROM users WHERE name = ? AND status = ?
+
+4. Using @Query Annotation
+
+Why use @Query?
+Sometimes, the method name query derivation isn’t enough for complex queries.
+The @Query annotation lets you write custom queries directly in your repository interface.
+
+For more complex queries, use the @Query annotation.
+
+a. JPQL (Java Persistence Query Language)
+
+What is JPQL?
+JPQL is a query language similar to SQL, but it works with your Java entity classes and
+their fields, not directly with database tables and columns.
+JPQL is object-oriented and works with entity names and fields.
+
+Why use it?
+It’s database-agnostic and object-oriented.
+
+Ex:
+
+@Query("SELECT u FROM User u WHERE u.email = :email")
+User findByEmail(@Param("email") String email);
+
+Info:
+User is your entity class, not the table name.
+u.email refers to the email field in your User class.
+:email is a named parameter.
+
+b. Native SQL
+
+What is Native SQL?
+Sometimes you need to use database-specific features or complex queries.
+Native queries let you write real SQL, using actual table and column names.
+Native queries use actual SQL and table/column names.
+
+Why use it?
+For performance, legacy queries, or DB-specific features.
+
+Ex:
+
+@Query(value = "SELECT * FROM users WHERE email = :email", nativeQuery = true)
+User findByEmailNative(@Param("email") String email);
+
+Info:
+users is the actual table name in your database.
+:email is still a named parameter.
+
+What is @Param("email") in @Query?
+
+In the @Query annotation, you write a JPQL query with a named parameter: :email.
+The @Param("email") annotation in the method parameter list tells Spring Data JPA to bind
+the value of the method argument (String email) to the named parameter :email in the query.
+
+Info:
+:email in the JPQL query is a placeholder for a value.
+@Param("email") links the method’s email argument to the :email placeholder in the query.
+When you call findByEmail("alice@example.com"), Spring Data JPA replaces :email with
+"alice@example.com" in the query.
+
+Why use it?
+It makes your queries clearer and safer (prevents SQL injection).
+You can use multiple parameters and bind them by name.
+
+Summary:
+@Param("email") binds the method parameter to the named parameter :email in your JPQL query,
+so Spring knows what value to use when executing the query.
+
+JPQL (Java Persistence Query Language)
+
+When to use JPQL:
+When you want to write queries using entity names and fields (not table/column names).
+When you want your code to be database-agnostic (works with any database).
+When you need to leverage JPA features like relationships, inheritance, and automatic mapping.
+For most standard queries in Spring Data JPA.
+
+Benefits:
+
+Portable across databases.
+Works well with JPA’s object-relational mapping.
+
+Native SQL
+
+When to use native SQL:
+When you need to use database-specific features (like functions, hints, or syntax).
+When you want to write queries using actual table and column names.
+When JPQL cannot express the query you need (complex joins, window functions, etc.).
+When you’re integrating with legacy databases or need maximum performance.
+
+Benefits:
+
+Full power and flexibility of SQL.
+Can use database-specific optimizations.
+
+Use Case	                                JPQL	                    Native SQL
+Entity-based queries	                    ✔️
+Database-agnostic code	                    ✔️
+Simple queries	                            ✔️
+Complex, DB-specific queries		                                       ✔️
+Legacy/optimized queries		                                           ✔️
+Table/column name usage		                                               ✔️
+
+
+
+In short:
+
+Use JPQL for most queries—especially when working with entities and wanting portability.
+Use native SQL when you need database-specific features, complex queries, or direct
+table/column access.

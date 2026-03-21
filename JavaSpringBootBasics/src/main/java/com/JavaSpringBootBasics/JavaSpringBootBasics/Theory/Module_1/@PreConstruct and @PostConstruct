@@ -1,0 +1,29 @@
+Bean Lifecycle Management: @PostConstruct and @PreDestroy:
+
+Spring manages the entire lifecycle of a bean, from creation to destruction.
+
+a. @PostConstruct:
+Purpose: Marks a method to be called after the bean is created and dependencies are injected.
+Usage: For initialization logic (e.g., opening a connection, setting up resources).
+Example:
+
+@Component
+public class EmailService {
+    @PostConstruct
+    public void init() {
+        System.out.println("EmailService initialized!");
+    }
+}
+
+b. @PreDestroy:
+Purpose: Marks a method to be called before the bean is destroyed (when the application context is closed).
+Usage: For cleanup logic (e.g., closing connections, releasing resources).
+Example:
+
+@Component
+public class EmailService {
+    @PreDestroy
+    public void cleanup() {
+        System.out.println("EmailService is being destroyed!");
+    }
+}

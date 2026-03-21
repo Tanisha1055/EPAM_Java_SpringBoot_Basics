@@ -1,0 +1,72 @@
+Q. What is Dependency Injection ?
+
+Dependency Injection is a design pattern where the dependencies (objects a class needs) are
+provided by an external source (the Spring container), rather than the class creating them
+itself. This leads to loose coupling and easier testing.
+It is the practical implementation of Inversion of Control Principle (IoC) , which ia a theory
+or theology .
+
+
+Types of Dependency Injection in Spring:
+
+a. Constructor-based Dependency Injection:
+
+How it works: Dependencies are provided through a class constructor.
+
+Advantages:
+Promotes immutability (fields can be final)
+Ensures all required dependencies are provided at object creation
+Easier to test (dependencies must be provided).
+
+Implementation:
+
+@Component
+public class UserService {
+    private final UserRepository userRepository;
+
+    @Autowired
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+}
+With Spring Boot, @Autowired is optional on constructors if the class has only one constructor.
+
+b. Setter-based Dependency Injection:
+How it works: Dependencies are provided through setter methods after the object is constructed.
+
+Advantages:
+Useful for optional dependencies
+Allows changing dependencies after object creation (not recommended for required dependencies)
+
+Implementation:
+
+@Component
+public class UserService {
+    private UserRepository userRepository;
+
+    @Autowired
+    public void setUserRepository(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+}
+
+c. Field-based Dependency Injection (Not recommended for most cases):
+
+How it works: Dependencies are injected directly into fields.
+
+Implementation:
+
+@Component
+public class UserService {
+    @Autowired
+    private UserRepository userRepository;
+}
+
+Note: This approach is less testable and not recommended for production code.
+
+Feature	                    Constructor Injection	            Setter Injection
+
+Immutability	            Promotes (fields can be final)	    Not promoted (fields are mutable)
+Required/Optional	        Good for required dependencies	    Good for optional dependencies
+Testability	                Easy to test	                    Easy to test
+Spring Usage	            Preferred for most cases	        Use for optional or circular deps

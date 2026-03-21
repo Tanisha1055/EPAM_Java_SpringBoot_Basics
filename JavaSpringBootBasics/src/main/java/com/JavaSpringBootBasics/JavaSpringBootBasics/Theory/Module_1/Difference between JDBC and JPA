@@ -1,0 +1,9 @@
+Feature	          JDBC (Java Database Connectivity)	         JPA (Java Persistence API)
+
+Level	          Low-level API	                             High-level specification
+Approach	      Manual SQL queries and result handling	 Object-Relational Mapping (ORM)
+Boilerplate	      More boilerplate code (connections, etc)	 Less code, handles mapping automatically
+Entity	          No concept of entities	                 Uses entities (Java classes mapped to DB)
+Transactions	  Manual management	                         Declarative with annotations
+Portability	      Tied to SQL dialects	                     More portable across databases
+Example	          See below	                                 See below

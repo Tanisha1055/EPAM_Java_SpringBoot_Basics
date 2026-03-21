@@ -1,0 +1,219 @@
+1. Types of Relationships
+
+a. One-to-One
+Definition:
+Each entity instance is related to exactly one instance of another entity.
+
+Example:
+A User has one Profile.
+
+@Entity
+public class User {
+    @Id @GeneratedValue
+    private Long id;
+
+    @OneToOne
+    @JoinColumn(name = "profile_id") // Foreign key in User table
+    private Profile profile;
+}
+
+@Entity
+public class Profile {
+    @Id @GeneratedValue
+    private Long id;
+    private String bio;
+}
+@OneToOne defines the relationship.
+@JoinColumn specifies the foreign key column.
+
+b. One-to-Many / Many-to-One
+
+Definition:
+One-to-Many: One entity is related to many instances of another entity.
+Many-to-One: Many entities relate to one instance of another entity.
+
+Example:
+A User has many Posts. Each Post belongs to one User.
+
+@Entity
+public class User {
+    @Id @GeneratedValue
+    private Long id;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Post> posts = new ArrayList<>();
+}
+
+@Entity
+public class Post {
+    @Id @GeneratedValue
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id") // Foreign key in Post table
+    private User user;
+}
+
+@OneToMany(mappedBy = "user") means the user field in Post owns the relationship.
+@ManyToOne is placed on the owning side (the table with the foreign key).
+
+c. Many-to-Many
+
+Definition:
+Each entity instance can relate to many instances of another entity, and vice versa.
+
+Example:
+A Student can enroll in many Courses, and a Course can have many Students.
+
+@Entity
+public class Student {
+    @Id @GeneratedValue
+    private Long id;
+
+    @ManyToMany
+    @JoinTable(
+        name = "student_course",
+        joinColumns = @JoinColumn(name = "student_id"),
+        inverseJoinColumns = @JoinColumn(name = "course_id")
+    )
+    private Set<Course> courses = new HashSet<>();
+}
+
+@Entity
+public class Course {
+    @Id @GeneratedValue
+    private Long id;
+
+    @ManyToMany(mappedBy = "courses")
+    private Set<Student> students = new HashSet<>();
+}
+
+@JoinTable defines the join table and its columns.
+
+What is inverseJoinColumns?
+
+In a @ManyToMany relationship, a join table is used to link the two entities (e.g.,
+student_course links Student and Course).
+The @JoinTable annotation defines the join table and its columns.
+joinColumns specifies the foreign key column(s) that reference the current entity
+(the owner).
+inverseJoinColumns specifies the foreign key column(s) that reference the other entity
+(the inverse side).
+
+Info:
+student_id is a foreign key to the Student table.
+course_id is a foreign key to the Course table.
+The join table (student_course) will look like:
+
+student_id	                                              course_id
+
+1	                                                      2
+1	                                                      3
+2	                                                      2
+
+Why do we use inverseJoinColumns?
+
+Clarity: It clearly defines which column in the join table points to which entity.
+Correct Mapping: Ensures JPA/Hibernate knows how to join the tables when fetching or saving
+data.
+Bidirectional Relationships: When both entities reference each other, inverseJoinColumns
+helps maintain the correct mapping from both sides.
+
+Benefits:
+
+Explicit Mapping:
+You control the names of the join table and its columns, which is important for database
+design, readability, and integration with existing schemas.
+
+Avoids Ambiguity:
+Without inverseJoinColumns, JPA might not know which column refers to which entity,
+especially in bidirectional relationships.
+
+Database Consistency:
+Ensures foreign keys are set up correctly, maintaining referential integrity.
+
+What does joinColumns mean in @JoinTable?
+In a @ManyToMany relationship, a join table (e.g., student_course) is created to connect the
+two entities (Student and Course).
+
+The join table has two foreign keys:
+One referencing the primary key of the owning entity (Student)
+One referencing the primary key of the inverse entity (Course)
+
+joinColumns = @JoinColumn(name = "student_id")
+This means the student_id column in the student_course table is a foreign key that refers to
+the id column (primary key) in the Student table.
+
+inverseJoinColumns = @JoinColumn(name = "course_id")
+This means the course_id column in the student_course table is a foreign key that refers to
+the id column (primary key) in the Course table.
+
+Student Table
+-------------
+id | name
+1  | Alice
+2  | Bob
+
+Course Table
+------------
+id | title
+2  | Math
+3  | Science
+
+student_course (Join Table)
+---------------------------
+student_id | course_id
+1          | 2
+1          | 3
+2          | 2
+
+How is the Join Table Created?
+
+1. Automatic Table Creation by JPA/Hibernate
+When you define a @ManyToMany relationship in your entity classes and use the @JoinTable
+annotation, JPA/Hibernate automatically creates the join table in the database for you—even
+if you don’t explicitly create it in your SQL scripts.
+
+You do not need to manually write SQL to create the join table.
+The table is created based on your entity annotations when you run your application and have
+spring.jpa.hibernate.ddl-auto=update (or create, create-drop) in your configuration.
+
+
+How is the Join Table Created?
+1. Automatic Table Creation by JPA/Hibernate
+
+When you define a @ManyToMany relationship in your entity classes and use the @JoinTable
+annotation, JPA/Hibernate automatically creates the join table in the database for you—even
+if you don’t explicitly create it in your SQL scripts.
+
+You do not need to manually write SQL to create the join table.
+The table is created based on your entity annotations when you run your application and have
+spring.jpa.hibernate.ddl-auto=update (or create, create-drop) in your configuration.
+
+2. What Does @JoinTable Do?
+
+@JoinTable tells JPA/Hibernate:
+The name of the join table (e.g., student_course)
+The columns that act as foreign keys (student_id, course_id)
+JPA uses this information to generate the join table schema.
+
+Both columns are foreign keys referencing the primary keys of the Student and Course tables.
+3. What if You Don’t Use @JoinTable?
+If you omit @JoinTable, JPA will still create a join table for a @ManyToMany relationship,
+but it will use default names (usually combining the entity names and their primary keys).
+
+4. Configuration Required
+For automatic table creation, make sure your application.properties or application.yml
+includes:
+
+properties
+
+spring.jpa.hibernate.ddl-auto=update
+
+or
+
+spring.jpa.hibernate.ddl-auto=create
+
+This tells Hibernate to generate (or update) the database schema based on your entity classes.
+
+

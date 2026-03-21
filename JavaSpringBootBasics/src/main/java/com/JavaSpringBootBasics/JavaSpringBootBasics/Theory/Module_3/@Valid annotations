@@ -1,0 +1,104 @@
+1. Using Hibernate Validator Annotations
+Hibernate Validator is the reference implementation of the Bean Validation (JSR 380) standard. It provides annotations to validate fields in your Java classes.
+
+Common Annotations
+
+(i)   @NotNull: Field must not be null.
+(ii)  @NotBlank: Field must not be null or empty (for Strings).
+(iii) @Size(min, max): String/Collection/Array must have a length within the specified range.
+(iv)  @Email: Field must be a valid email address.
+(v)   @Min, @Max: Numeric value must be within the specified range.
+(vi)  @Pattern: String must match a regular expression.
+
+Example DTO
+
+public class UserDTO {
+    @NotBlank(message = "Name is required")
+    private String name;
+
+    @Email(message = "Email should be valid")
+    private String email;
+
+    @Size(min = 8, max = 20, message = "Password must be 8-20 characters")
+    private String password;
+    // getters and setters
+}
+
+2. Validating Request Bodies with @Valid
+
+@Valid is used in controller methods to trigger validation on request bodies (DTOs).
+If validation fails, Spring throws a MethodArgumentNotValidException before your method runs.
+
+Example Controller
+
+@RestController
+@RequestMapping("/users")
+public class UserController {
+
+    @PostMapping
+    public ResponseEntity<User> createUser(@Valid @RequestBody UserDTO userDTO) {
+        // If validation fails, this code is not executed
+        User user = new User(userDTO.getName(), userDTO.getEmail(), userDTO.getPassword());
+        return ResponseEntity.status(HttpStatus.CREATED).body(user);
+    }
+}
+
+Handling Validation Errors
+You can handle validation errors globally using @RestControllerAdvice:
+
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getFieldErrors().forEach(error ->
+            errors.put(error.getField(), error.getDefaultMessage())
+        );
+        return ResponseEntity.badRequest().body(errors);
+    }
+}
+
+3. Creating Custom Validation Rules Using @Constraint
+Sometimes, built-in annotations are not enough. You can create your own validation annotation.
+
+Step 1: Create the Annotation
+
+@Documented
+@Constraint(validatedBy = UsernameValidator.class)
+@Target({ ElementType.FIELD })
+@Retention(RetentionPolicy.RUNTIME)
+public @interface ValidUsername {
+    String message() default "Invalid username";
+    Class<?>[] groups() default {};
+    Class<? extends Payload>[] payload() default {};
+}
+
+Step 2: Create the Validator
+
+public class UsernameValidator implements ConstraintValidator<ValidUsername, String> {
+    @Override
+    public boolean isValid(String username, ConstraintValidatorContext context) {
+        // Custom logic: username must start with a letter and be 5-15 chars
+        return username != null && username.matches("^[A-Za-z][A-Za-z0-9_]{4,14}$");
+    }
+}
+
+Step 3: Use the Custom Annotation
+
+public class UserDTO {
+    @ValidUsername
+    private String username;
+    // other fields, getters, setters
+}
+
+4. Summary Table
+
+Annotation	           Purpose	                             Example Usage
+
+@NotNull	           Field must not be null	             @NotNull String name
+@NotBlank	           String must not be null/empty	     @NotBlank String name
+@Size	               Length/size constraints	             @Size(min=2, max=10) String pwd
+@Email	               Validates email format	             @Email String email
+@Valid	               Triggers validation in controller	 @Valid @RequestBody UserDTO dto
+@Constraint	           For custom validation annotations	 @ValidUsername String username

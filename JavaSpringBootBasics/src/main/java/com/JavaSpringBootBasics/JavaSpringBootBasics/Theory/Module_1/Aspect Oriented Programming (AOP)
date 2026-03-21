@@ -1,0 +1,30 @@
+Q. What is Aspect-Oriented Programming (AOP) in Spring Framework?
+
+AOP (Aspect-Oriented Programming) is a programming paradigm that allows you to separate
+cross-cutting concerns from your main business logic. Cross-cutting concerns are parts of
+a program that affect multiple modules, such as logging, security, or transaction management.
+
+Why use AOP?
+
+It keeps your business logic clean and focused.
+You can add or change cross-cutting behavior (like logging) in one place, rather than
+scattering it throughout your code.
+
+How does Spring implement AOP?
+
+Spring uses proxies and aspects to apply additional behavior before, after, or around method
+executions. You define aspects using the @Aspect annotation and advice using annotations like
+@Before, @After, @Around.
+Example: Logging with AOP
+
+@Aspect
+@Component
+public class LoggingAspect {
+    @Before("execution(* com.example.service.*.*(..))")
+    public void logBefore(JoinPoint joinPoint) {
+        System.out.println("Method called: " + joinPoint.getSignature());
+    }
+}
+
+This logs every method call in the com.example.service package, without modifying the actual
+service classes.

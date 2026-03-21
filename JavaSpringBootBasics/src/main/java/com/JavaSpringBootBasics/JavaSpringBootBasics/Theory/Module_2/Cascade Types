@@ -1,0 +1,18 @@
+5. Cascade Types
+
+Cascade types define what happens to related entities when you perform operations (save,
+delete, etc.) on the parent.
+
+ALL: Applies all cascade operations.
+PERSIST: Saves related entities when the parent is saved.
+MERGE: Merges changes to related entities.
+REMOVE: Deletes related entities when the parent is deleted.
+REFRESH: Refreshes related entities.
+DETACH: Detaches related entities from the persistence context.
+
+Example:
+
+@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+private List<Post> posts;
+
+If you save or delete a User, all their Posts are also saved or deleted.

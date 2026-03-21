@@ -1,0 +1,82 @@
+What Are JPA-Specific Features in JpaRepository?
+
+When you extend JpaRepository, you get all the basic CRUD and paging/sorting methods,
+plus extra features that are only possible because of JPA (Java Persistence API) and its
+underlying implementation (like Hibernate). These features are not available in the more
+basic CrudRepository or PagingAndSortingRepository.
+
+1. JPA-Specific Batch Operations
+
+What are batch operations?
+
+Batch operations allow you to perform actions (like saving or deleting) on multiple entities
+in a single operation, rather than one at a time. This is more efficient because it reduces
+the number of database calls.
+
+How does JpaRepository support batch operations?
+
+JpaRepository provides methods like:
+saveAll(Iterable<S> entities)
+deleteInBatch(Iterable<T> entities)
+deleteAllInBatch()
+
+Example: Batch Save
+
+List<User> users = Arrays.asList(
+    new User("Alice"),
+    new User("Bob"),
+    new User("Charlie")
+);
+userRepository.saveAll(users); // Saves all users in one go
+
+Example: Batch Delete
+
+userRepository.deleteInBatch(users); // Deletes all given users in one operation
+userRepository.deleteAllInBatch();   // Deletes all users in the table in one operation
+
+Why is this JPA-specific?
+These methods use JPA’s EntityManager under the hood, which can optimize how multiple
+operations are sent to the database, making them more efficient than looping and calling
+save() or delete() one by one.
+
+2. JPA-Specific Flush
+
+What does "flush" mean?
+Flushing is the process of synchronizing the current state of the persistence context (the
+in-memory changes you’ve made to your entities) with the database.
+
+By default, JPA flushes changes at the end of a transaction (when you commit).
+Sometimes, you want to force these changes to be written to the database immediately—this is
+where flush() comes in.
+
+How does JpaRepository support flush?
+
+flush(): Forces all pending changes to be written to the database right now.
+saveAndFlush(entity): Saves the entity and immediately flushes changes.
+
+Example: Using flush
+
+User user = new User("David");
+userRepository.save(user);
+// At this point, the user may not be in the database yet (still in memory)
+
+userRepository.flush(); // Now, the user is definitely saved in the database
+
+Example: saveAndFlush
+
+User user = new User("Eve");
+userRepository.saveAndFlush(user); // Saves and flushes immediately
+
+Why is this JPA-specific?
+Flushing is a concept from JPA’s EntityManager. It gives you fine-grained control over when
+your changes are actually persisted to the database, which can be important for certain
+business logic or performance tuning.
+
+Summary Table
+
+Feature	                  What it does	                                  Example usage
+
+Batch Save	              Save multiple entities at once	              saveAll(users)
+Batch Delete	          Delete multiple entities at once	              deleteInBatch(users)
+Flush	                  Force pending changes to be written to the DB	  flush()
+Save and Flush	          Save an entity and immediately flush changes	  saveAndFlush(user)

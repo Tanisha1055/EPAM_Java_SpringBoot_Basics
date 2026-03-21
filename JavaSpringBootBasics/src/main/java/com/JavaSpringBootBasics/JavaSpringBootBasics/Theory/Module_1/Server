@@ -1,0 +1,110 @@
+🔹 What is a Server?
+
+A server is:
+A system (hardware or software) that provides services, data, or resources to other systems
+called clients.
+
+🔹 Simple Meaning
+
+If something:
+Receives requests
+Processes them
+Sends back a response
+
+👉 That is acting as a server.
+
+🔹 Client–Server Example
+
+When you open a website:
+
+Your browser sends request
+A server receives it
+Server processes it
+Server sends response (HTML, JSON, etc.)
+
+So:
+Browser = Client
+Backend machine = Server
+
+🔹 Is Server Always a Machine?
+
+Not necessarily.
+
+A server can be:
+
+1️⃣ Physical Machine
+A computer running 24/7 in a data center.
+
+2️⃣ Virtual Machine (Cloud)
+Example:
+Amazon Web Services
+Microsoft Azure
+
+3️⃣ Software Program
+Example:
+Apache Tomcat
+Nginx
+
+Your Spring Boot app also runs inside a server.
+
+🔹 Types of Servers
+
+Different servers provide different services:
+
+Type	                                             What It Does
+
+Web Server	                                         Serves web pages
+Application Server	                                 Runs business logic
+Database Server	                                     Stores & manages data
+File Server	                                         Stores files
+Mail Server	                                         Handles emails
+
+Example database server:
+MySQL
+
+When you call a REST API:
+Client → Web Server → Application → Database Server → Response → Client
+
+Spring Boot:
+
+Starts embedded Tomcat
+Binds it to port 8080 (default)
+Loads your controllers
+Starts listening for HTTP requests
+
+Now your app is:
+👉 Acting as a server.
+
+JVM Process
+ ├── Embedded Server (Tomcat)
+ ├── Spring IoC Container
+ │     ├── Controllers
+ │     ├── Services
+ │     ├── Repositories
+ │     └── Other Beans
+
+Q.Why Is It Outside IoC?
+
+Because:
+👉 The server must start before Spring can receive any request.
+
+Think about order of startup:
+
+JVM starts
+Spring Boot starts
+Embedded Tomcat starts
+Tomcat starts listening on port
+Tomcat loads Spring’s DispatcherServlet
+Now requests can reach Spring
+
+So the server is infrastructure.
+Spring IoC is application logic.
+
+🔥 Important Separation of Concerns
+Layer	                                             Responsibility
+
+OS	                                                 Runs processes
+JVM	                                                 Runs Java code
+Tomcat	                                             Handles HTTP
+Spring IoC	                                         Manages beans
+Your Service	                                     Business logic

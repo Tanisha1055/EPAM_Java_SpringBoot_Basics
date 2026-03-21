@@ -1,0 +1,114 @@
+1. Handling Request Bodies with @RequestBody
+
+Theory:
+@RequestBody tells Spring to convert incoming JSON (or XML) into a Java object.
+Used for POST and PUT requests, where the client sends data.
+
+Implementation:
+
+@PostMapping("/users")
+public User createUser(@RequestBody User user) {
+    // 'user' is automatically populated from the JSON request body
+    return userService.save(user);
+}
+
+How it works:
+The client sends JSON like { "name": "Alice", "email": "alice@example.com" }.
+Spring uses Jackson to convert this JSON into a User object.
+
+
+2. Returning JSON or XML Responses with Jackson
+
+Theory:
+By default, Spring uses Jackson to convert Java objects to JSON for responses.
+If you want XML, you can add the Jackson XML dependency.
+
+Implementation:
+
+@GetMapping("/users/{id}")
+public User getUser(@PathVariable Long id) {
+    // Returns a User object as JSON (or XML if configured)
+    return userService.findById(id);
+}
+
+How it works:
+Spring automatically serializes the returned object to JSON (or XML).
+The client receives a response like { "id": 1, "name": "Alice" }.
+
+To support XML:
+
+Add this dependency to your Maven/Gradle:
+
+<dependency>
+    <groupId>com.fasterxml.jackson.dataformat</groupId>
+    <artifactId>jackson-dataformat-xml</artifactId>
+</dependency>
+
+3. Using ResponseEntity for Fine Control Over HTTP Responses and Status Codes
+
+Theory:
+
+ResponseEntity lets you control the HTTP status code, headers, and body of the response.
+Useful for sending custom status codes (like 404, 201), headers, or error messages.
+
+Implementation:
+
+@GetMapping("/users/{id}")
+public ResponseEntity<User> getUser(@PathVariable Long id) {
+    User user = userService.findById(id);
+    if (user == null) {
+        return ResponseEntity.notFound().build(); // 404 Not Found
+    }
+    return ResponseEntity.ok(user); // 200 OK with user data
+}
+
+@PostMapping("/users")
+public ResponseEntity<User> createUser(@RequestBody User user) {
+    User createdUser = userService.save(user);
+    return ResponseEntity.status(HttpStatus.CREATED).body(createdUser); // 201 Created
+}
+
+How it works:
+
+You can set the status code (200, 201, 404, etc.).
+You can set the response body (user data, error message).
+You can add custom headers.
+
+4. Adding Custom HTTP Headers
+
+Theory:
+
+Sometimes you need to send extra information in headers (like authentication tokens,
+custom metadata).
+
+Implementation:
+
+@GetMapping("/users/{id}")
+public ResponseEntity<User> getUser(@PathVariable Long id) {
+    User user = userService.findById(id);
+    if (user == null) {
+        return ResponseEntity.notFound().build();
+    }
+    HttpHeaders headers = new HttpHeaders();
+    headers.add("X-Custom-Header", "CustomValue");
+    return ResponseEntity.ok().headers(headers).body(user);
+}
+
+How it works:
+
+(i) You create a HttpHeaders object.
+(ii) Add custom headers.
+(iii) Attach headers to the ResponseEntity.
+
+
+5. Summary Table
+Concept	        Annotation/Class    Purpose	                      Example Usage
+
+Request Body	@RequestBody	   Convert JSON/XML to            @RequestBody User user
+                                   Java object
+Response Body	Jackson	Convert    Java object to JSON/XML	      return user;
+Status Codes	ResponseEntity	   Control HTTP status            ResponseEntity.ok(user)
+                                   and response
+Custom Headers	HttpHeaders	       Add extra info to response     headers.add("X-Custom",
+                                   headers	                       "Value")
+

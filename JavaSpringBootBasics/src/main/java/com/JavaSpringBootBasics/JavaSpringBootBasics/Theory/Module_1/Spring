@@ -1,0 +1,45 @@
+What is Spring Framework?
+
+Spring Framework is a powerful, open-source framework for building Java applications,
+especially enterprise-level apps. Spring manages the "plumbing" (infrastructure code)
+(boilerplate code) so you can focus on business logic.
+
+Advantages of Spring Framework:
+
+a. Loose Coupling
+What it means: Components (classes, services, etc.) in your application are independent of
+each other.
+Why it matters: If you change one part, others are not affected. This makes your code easier
+to maintain and test.
+How Spring achieves this: Through Dependency Injection (DI) and Inversion of Control (IoC).
+
+b. Inversion of Control (IoC) and Dependency Injection (DI)
+IoC: Instead of your code creating objects, the Spring container does it for you. The control
+of object creation is "inverted" from your code to the framework.
+DI: Spring injects dependencies (objects your class needs) automatically, either via
+constructor, setter, or field injection.
+
+Example:
+
+@Component
+public class UserService {
+    private final UserRepository userRepository;
+
+    // Constructor Injection
+    @Autowired
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+}
+Here, UserRepository is injected into UserService by Spring, not manually created.
+
+c. Modular Architecture
+What it means: Spring is divided into modules (Core, AOP, Data Access, Web, etc.). You only
+use what you need.
+Why it matters: Your application stays lightweight and efficient.
+
+d. Scalability
+What it means: Spring can handle small to very large applications.
+Why it matters: As your project grows, Spring can support more features and higher loads
+without major rewrites.
+

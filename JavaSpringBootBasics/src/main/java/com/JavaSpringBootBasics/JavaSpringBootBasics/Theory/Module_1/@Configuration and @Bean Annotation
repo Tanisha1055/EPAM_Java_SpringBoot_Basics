@@ -1,0 +1,34 @@
+Configuration Annotations: @Configuration and @Bean
+
+@Configuration
+
+Marks a class as a source of bean definitions.
+Used to define beans using Java code instead of XML.
+
+@Bean
+
+Marks a method as a bean producer. The method’s return value is registered as a bean in the
+Spring container.
+Example:
+
+@Configuration
+public class AppConfig {
+
+    @Bean
+    public UserService userService() {
+        return new UserService(userRepository());
+    }
+
+    @Bean
+    public UserRepository userRepository() {
+        return new UserRepository();
+    }
+}
+
+Here, AppConfig is a configuration class.
+userService() and userRepository() methods define beans.
+
+When to use:
+
+Use @Configuration and @Bean for explicit, fine-grained control over bean creation, or when
+integrating third-party libraries.

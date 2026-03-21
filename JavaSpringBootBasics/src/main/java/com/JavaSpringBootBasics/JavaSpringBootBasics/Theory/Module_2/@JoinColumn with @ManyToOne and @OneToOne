@@ -1,0 +1,63 @@
+What Happens When You Use @JoinColumn Without @ManyToMany?
+
+1. @JoinColumn with @ManyToOne or @OneToOne
+When you use @JoinColumn with @ManyToOne or @OneToOne, no third (join) table is created.
+Instead, a foreign key column is added directly to the table of the entity where the
+annotation is used.
+
+Example: @ManyToOne
+
+@Entity
+public class Post {
+    @Id @GeneratedValue
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id") // Foreign key in Post table
+    private User user;
+}
+
+Result:
+
+The Post table will have a user_id column that is a foreign key referencing the User table.
+No extra table is created.
+
+Example: @OneToOne
+
+@Entity
+public class User {
+    @Id @GeneratedValue
+    private Long id;
+
+    @OneToOne
+    @JoinColumn(name = "profile_id") // Foreign key in User table
+    private Profile profile;
+}
+
+Result:
+The User table will have a profile_id column referencing the Profile table.
+No extra table is created.
+
+2. @JoinColumn with @ManyToMany
+Only in a @ManyToMany relationship does JPA create a third (join) table to manage the
+relationship.
+This is because neither side can hold a foreign key to the other without duplicating data
+or breaking normalization.
+
+Summary Table
+
+Relationship Type	     @JoinColumn Effect	                            Extra Table Created?
+
+@ManyToOne	             Adds FK column to owning entity’s table	         No
+@OneToOne	             Adds FK column to owning entity’s table	         No
+@ManyToMany	             Creates a join table with FKs to both entities	     Yes
+
+In short:
+
+@JoinColumn with @ManyToOne or @OneToOne → Adds a foreign key column, no third table.
+@JoinColumn with @ManyToMany (inside @JoinTable) → Creates a third (join) table.
+
+Info:
+In Many To Many a third table is created for better visualisation and it bit better
+normalisation.
+

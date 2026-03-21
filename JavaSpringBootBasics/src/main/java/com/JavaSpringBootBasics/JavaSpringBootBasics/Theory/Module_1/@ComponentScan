@@ -1,0 +1,30 @@
+Component Scanning with @Component, @Service, @Repository:
+
+Component scanning is how Spring automatically detects and registers beans in your
+application, reducing manual configuration.
+
+@Component: Generic stereotype for any Spring-managed component.
+@Service: Specialization of @Component for service layer classes.
+@Repository: Specialization of @Component for data access layer (DAO) classes. Also adds
+exception translation for database errors.
+How it works:
+
+Annotate your classes with these annotations.
+Enable component scanning in your configuration (with @SpringBootApplication or @ComponentScan).
+Example:
+
+@Component
+public class EmailSender { }
+
+@Service
+public class UserService { }
+
+@Repository
+public class UserRepository { }
+Spring Boot enables component scanning by default for the main package and sub-packages.
+
+@ComponentScan is basically what scans and defines what beans are to be there, and it is present
+by default in @SpringBootApplication annotation. Which enables it to scan the current package
+and all its sub-packages . If you explicitly mention @ComponentScan and mention teh package
+inside then that particular package will only be considered for bean scanning . You can also
+mention array of packages as bean .

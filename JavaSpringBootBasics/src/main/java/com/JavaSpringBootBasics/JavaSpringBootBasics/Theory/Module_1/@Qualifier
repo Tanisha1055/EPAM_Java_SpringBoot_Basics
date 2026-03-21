@@ -1,0 +1,37 @@
+Injecting Dependencies Using @Qualifier (Resolving Bean Conflicts):
+
+When you have multiple beans of the same type, Spring doesn’t know which one to inject. Use
+@Qualifier to specify exactly which bean you want.
+
+How it works:
+
+Annotate your bean with a unique name using @Component("beanName") or @Bean("beanName").
+Use @Qualifier("beanName") where you inject the dependency.
+Example:
+
+Define multiple beans:
+
+@Component("mysqlRepository")
+public class MySQLUserRepository implements UserRepository { }
+
+@Component("mongoRepository")
+public class MongoUserRepository implements UserRepository { }
+
+Inject with @Qualifier:
+
+@Component
+public class UserService {
+    private final UserRepository userRepository;
+
+    @Autowired
+    public UserService(@Qualifier("mysqlRepository") UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+}
+
+Summary Table:
+
+Situation	                                         Solution
+
+Only one bean of a type                         	 @Autowired is enough
+Multiple beans of the same type	                     Use @Qualifier

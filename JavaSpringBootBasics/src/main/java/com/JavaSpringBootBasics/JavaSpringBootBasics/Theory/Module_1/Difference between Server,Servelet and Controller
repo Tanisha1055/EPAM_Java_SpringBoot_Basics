@@ -1,0 +1,96 @@
+Yes — all three are involved in handling HTTP requests.
+But they operate at different layers and responsibilities.
+
+Even though all of them “handle requests”, they handle different parts of the request lifecycle.
+
+Think of it like a hospital:
+
+Reception (server)
+Department routing (servlet)
+Doctor (controller)
+
+All deal with the patient — but differently.
+
+1.Server:
+Example: Embedded Apache Tomcat
+
+What it does:
+
+Listens on port 8080
+Accepts TCP connections
+Parses raw HTTP
+Creates request & response objects
+Manages threads
+Passes request to a Servlet
+
+It works at:
+👉 Network + HTTP protocol level
+
+It does NOT know:
+What /users means
+What business logic is
+
+It only knows:
+“Someone sent an HTTP request. Let me pass it to a servlet.”
+
+
+2️.Servlet (DispatcherServlet):
+Servlet is part of Java EE specification.
+
+In Spring MVC, the main servlet is:
+👉 DispatcherServlet
+
+This is Spring’s front controller.
+
+What it does:
+
+Receives request from Tomcat
+Looks at URL
+Finds matching controller
+Handles validation
+Calls controller
+Handles response formatting
+
+It works at:
+👉 Framework level
+
+It understands:
+@RequestMapping
+@GetMapping
+JSON conversion
+Exception handling
+
+3.Controller:
+Your controller:
+
+@GetMapping("/users")
+public List<User> getUsers() { ... }
+
+It:
+Executes business logic
+Calls services
+Returns data
+
+It works at:
+👉 Application logic level
+
+It does NOT care about:
+
+TCP
+Threads
+Parsing HTTP
+Routing rules
+
+Q. Why Can’t One Component Do Everything?
+
+Because of Separation of Concerns.
+
+If controller handled:
+
+Networking
+Threading
+HTTP parsing
+Routing
+Business logic
+
+It would be messy and unmaintainable.

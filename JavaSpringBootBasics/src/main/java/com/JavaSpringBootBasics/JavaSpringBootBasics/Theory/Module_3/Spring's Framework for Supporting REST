@@ -1,0 +1,30 @@
+3. Overview of Spring Framework’s Support for REST API Development
+
+Spring Framework is a popular Java framework for building web applications, including
+RESTful APIs. Spring provides several modules to make REST API development easy and efficient.
+
+Key Spring Modules for REST:
+
+Spring Web MVC:
+Handles HTTP requests and responses, mapping URLs to Java methods.
+
+Spring Boot:
+Simplifies setup and configuration, allowing you to create REST APIs quickly with minimal boilerplate.
+
+Spring Data:
+Integrates with databases, making it easy to manage resources.
+
+How Spring Supports REST:
+
+(i)  Annotation-Based Configuration:
+Use annotations like @RestController, @RequestMapping, @GetMapping, @PostMapping, etc., to
+define REST endpoints.
+
+(ii)  Automatic JSON/XML Serialization:
+Spring automatically converts Java objects to JSON or XML for API responses.
+
+(iii) Exception Handling:
+Use @ExceptionHandler or @ControllerAdvice to handle errors gracefully.
+
+(iv) Validation:
+Use @Valid and validation annotations to ensure data integrity.

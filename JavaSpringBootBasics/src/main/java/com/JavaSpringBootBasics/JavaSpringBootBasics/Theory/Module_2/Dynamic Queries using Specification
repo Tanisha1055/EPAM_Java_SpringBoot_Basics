@@ -1,0 +1,132 @@
+2. Dynamic Queries Using Specifications
+
+Theory
+Specifications allow you to build queries dynamically at runtime.
+Useful when you don’t know all the query conditions in advance (e.g., search filters).
+Spring Data JPA provides the JpaSpecificationExecutor interface for this.
+
+1. Dynamic Queries Using Specifications
+What are Specifications?
+Specifications let you build queries in Java code, dynamically, based on conditions you know
+only at runtime (like user search filters).
+You don’t have to write fixed query methods for every possible combination of filters.
+
+How do you use Specifications?
+Step 1: Extend JpaSpecificationExecutor in your repository
+
+Implementation
+Step 1: Extend JpaSpecificationExecutor
+
+public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {}
+
+Step 2: Create Specifications
+
+import org.springframework.data.jpa.domain.Specification;
+
+Specification<User> ageGreaterThan(int age) {
+    return (root, query, cb) -> cb.greaterThan(root.get("age"), age);
+}
+
+Specification<User> nameEquals(String name) {
+    return (root, query, cb) -> cb.equal(root.get("name"), name);
+}
+
+Step 3: Combine Specifications
+
+Specification<User> spec = ageGreaterThan(18).and(nameEquals("Alice"));
+List<User> users = userRepository.findAll(spec);
+
+You can combine specifications with .and(), .or(), etc.
+
+
+Q. What Are root, query, and cb?
+
+When you write a Specification in Spring Data JPA, you use a lambda expression that takes
+three parameters:
+
+(root, query, cb) -> ...
+These correspond to:
+
+(i) root (Root<T>)
+Represents the entity/table you are querying.
+Used to access fields/columns of your entity.
+Example: root.get("age") accesses the age field of the User entity.
+
+(ii) query (CriteriaQuery<?>)
+Represents the overall query being built.
+Used for advanced query features (like grouping, ordering, etc.).
+For simple Specifications, you often don’t need to use it directly.
+
+(iii) cb (CriteriaBuilder)
+The CriteriaBuilder is a helper object that provides methods to build query conditions (predicates).
+Example: cb.greaterThan(...), cb.equal(...), cb.and(...), etc.
+Example Breakdown
+
+Specification<User> ageGreaterThan(int age) {
+    return (root, query, cb) -> cb.greaterThan(root.get("age"), age);
+}
+
+Info:
+root.get("age"): Accesses the age field of the User entity.
+cb.greaterThan(...): Builds a "greater than" condition for the query.
+
+Ex 2:
+
+Specification<User> nameEquals(String name) {
+    return (root, query, cb) -> cb.equal(root.get("name"), name);
+}
+
+Info:
+root.get("name"): Accesses the name field of the User entity.
+cb.equal(...): Builds an "equals" condition for the query.
+
+
+In Short:
+root: The entity/table you’re querying (lets you access fields).
+query: The query object (lets you customize the query, usually for advanced use).
+cb: The CriteriaBuilder (lets you build conditions for your query).
+
+
+Summary Table
+
+Parameter	 Type	            Purpose	                                 ExampleUsage
+
+root	     Root        	    Access entity fields/columns	         root.get("age")
+query	     CriteriaQuery<?>	Customize the query (group, order, etc)	 query.orderBy(...)
+cb	         CriteriaBuilder	Build query conditions (predicates)	     cb.equal(...),
+                                                                         cb.and(...)
+
+
+What does root.get("age"), age mean in cb.greaterThan(root.get("age"), age)?
+
+(i) root.get("age"):
+This does not return the value of the age field for a specific user.
+Instead, it returns a reference to the "age" field/column in the database table for use in
+building a query.
+
+(ii) age (the second parameter):
+This is the actual value you want to compare against (for example, 18).
+
+How does it work?
+When you write:
+
+cb.greaterThan(root.get("age"), age)
+
+You are telling JPA:
+"Build a condition where the value in the age column of the table is greater than the value
+of the age parameter I provided."
+
+In SQL terms, it’s like:
+
+WHERE age > 18
+
+The first age is the column in the table (root.get("age")).
+The second age is the value you’re comparing to (the method parameter).
+
+In Short:
+root.get("age"): Refers to the column in the database.
+age: Refers to the value you want to compare against.
+
+You need both:
+One to tell JPA which column to use,
+One to tell it what value to compare to.
