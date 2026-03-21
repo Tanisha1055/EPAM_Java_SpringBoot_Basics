@@ -1,6 +1,7 @@
 package com.JavaSpringBootBasics.JavaSpringBootBasics.Service.implementations;
 
 import com.JavaSpringBootBasics.JavaSpringBootBasics.Entity.Applicant;
+import com.JavaSpringBootBasics.JavaSpringBootBasics.Entity.Application;
 import com.JavaSpringBootBasics.JavaSpringBootBasics.Entity.Resume;
 import com.JavaSpringBootBasics.JavaSpringBootBasics.Repository.ApplicantRepository;
 import com.JavaSpringBootBasics.JavaSpringBootBasics.Service.interfaces.ApplicantService;
@@ -18,9 +19,17 @@ public class ApplicantServiceImpl implements ApplicantService {
     @Override
     public Applicant saveApplicant(Applicant applicant) {
         Resume resume=applicant.getResume();
+        List<Application> applications=applicant.getApplications();
         if(resume!=null)
         {
             resume.setApplicant(applicant);
+        }
+        if(applications!=null)                          //as if the applications is null ,
+        {                                               //it will crash .
+            for(Application application:applications)
+            {
+                application.setApplicant(applicant);
+            }
         }
         return applicantRepository.save(applicant);
     }
