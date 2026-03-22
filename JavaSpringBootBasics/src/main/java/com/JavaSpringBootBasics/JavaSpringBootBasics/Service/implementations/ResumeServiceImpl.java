@@ -1,6 +1,7 @@
 package com.JavaSpringBootBasics.JavaSpringBootBasics.Service.implementations;
 
 import com.JavaSpringBootBasics.JavaSpringBootBasics.Entity.Resume;
+import com.JavaSpringBootBasics.JavaSpringBootBasics.Exception.ResumeAlreadyExistsException;
 import com.JavaSpringBootBasics.JavaSpringBootBasics.Repository.ResumeRepository;
 import com.JavaSpringBootBasics.JavaSpringBootBasics.Service.interfaces.ResumeService;
 import lombok.extern.slf4j.Slf4j;
@@ -30,8 +31,18 @@ public class ResumeServiceImpl implements ResumeService {
     public List<Resume> getAllResumes() {
         return resumeRepository.findAll();
     }
+
+    public Resume saveNewResume(Resume resume)
+    {
+        if(resume.getId()!=null)
+        {
+            throw new ResumeAlreadyExistsException("Resume already exists !");
+        }
+        return resumeRepository.save(resume);
+    }
 }
 
+//Logging:
 //Added logging by @Slf4j annotation which is coming from lombok , which helps us to use
 //shorter syntaxes , with direct log , instead of creating logger factory , and we can define
 //the require level of severity after the log , like log.info and pass the message which we
@@ -51,3 +62,10 @@ public class ResumeServiceImpl implements ResumeService {
 
 //Logging levels defined according to their severity.
 //trace->debug->info->warn->error->fatal . (increasing order of heirarchy)
+
+
+//Exception Handling:
+//Here we have thrown ResumeAlreadyExistsException exception , which will be handled by the
+//GlobalExceptionHAndler class , in a one single generic place. Which demonstrates the power
+//of SpringBoot Exception Handler.
+//(for more details visit that class) .
