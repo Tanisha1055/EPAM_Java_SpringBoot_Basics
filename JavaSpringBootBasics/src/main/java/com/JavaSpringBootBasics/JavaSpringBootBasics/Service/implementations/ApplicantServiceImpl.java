@@ -55,6 +55,11 @@ public class ApplicantServiceImpl implements ApplicantService {
     {
         return applicantRepository.findByName(name);
     }
+
+    public List<Applicant> findApplicantByPartialName(String name)
+    {
+        return applicantRepository.findByPartialName(name);
+    }
 }
 
 //In this we are using the interface, but spring will first scan the Service class and
