@@ -50,6 +50,11 @@ public class ApplicantServiceImpl implements ApplicantService {
         applicantRepository.deleteById(id);
         return "Applicant deleted";
     }
+
+    public List<Applicant> findApplicantsByName(String name)
+    {
+        return applicantRepository.findByName(name);
+    }
 }
 
 //In this we are using the interface, but spring will first scan the Service class and
