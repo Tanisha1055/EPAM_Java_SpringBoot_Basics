@@ -52,7 +52,7 @@ public interface ApplicantRepository extends JpaRepository<Applicant,Long> {
 //JPQL we would say: SELECT a from Applicant a WHERE a.name LIKE %:name% . And we have to
 //write it on top of a method , and this :name is very important as it indicates the variable
 //in the query which is substitutable by the incoming method arg , as we are writing it on top
-//of a method. Now to indicate which variable in the query is substitutable by whoch name
+//of a method. Now to indicate which variable in the query is substitutable by which name
 //of the arg, of the method , after writing the normal method , we give  @Param annotation
 //inside the arg, and specify the name of the arg whose :name we have to search again within
 //(" ") quotes, like @Param("name") and then specify the normal arg .

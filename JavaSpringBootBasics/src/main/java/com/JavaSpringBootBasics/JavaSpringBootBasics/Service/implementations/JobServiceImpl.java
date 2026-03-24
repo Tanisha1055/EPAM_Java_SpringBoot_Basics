@@ -5,6 +5,9 @@ import com.JavaSpringBootBasics.JavaSpringBootBasics.Entity.Job;
 import com.JavaSpringBootBasics.JavaSpringBootBasics.Repository.ApplicantRepository;
 import com.JavaSpringBootBasics.JavaSpringBootBasics.Repository.JobRepository;
 import com.JavaSpringBootBasics.JavaSpringBootBasics.Service.interfaces.JobService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -59,8 +62,45 @@ public class JobServiceImpl implements JobService {
 
         return jobRepository.save(job);
     }
+
+    public Page<Job> findJobsByPage (int page, int size)
+    {
+        Pageable pageable= PageRequest.of(page,size);
+        return jobRepository.findAll(pageable);
+    }
+
 }
 
 // as rest everything is handled by orElseThrow() , so I can directly use the value .
 //get() is risky , orElse is safe() , alo ifPresent() would add unnecessary complexity ,
 //by addition of lambda function . as if not present you won't be able to return jobs .
+
+
+//Pagination:
+
+
+//Here we have added a method to get the results divided in pages, so that we don't have to
+//get all the data in one place , which would make the query slower. So pagination helps in
+//faster retrieval of smaller chunks of data . Page literally means smaller chunk of data .
+//so we specify the page , i.e. the number of times we want to retrieve the data in certain
+//numbers of time .
+
+//We also define the size ,i.e. the no. of data needed in one page , or the amount of data
+//needed in one go .
+
+//So if we have total 11 data , and we divide the page in 3 and the size is 5 , so in the 1st
+//page i.e. the 0th page , we will have 5 data (first 5), similarly in 2nd page we have (next)
+//5 data , and in the last page we have 1 data left (remaining 1 data left) .
+
+//So pageable is an interface which is basically a set of instructions which is passed to the
+//repository layer , so the hibernate can use it to execute queries internally . As the Pageable
+//contains the page and size metadata info , so the hibernate internally generates queries
+//like LIMIT and OFFSET to execute that function . Now PageRequest.of() is a static to create
+//obj of Pageable , as Pageable is an interface, so we need to pass an obj of to repository
+
+//So PageRequest is a class , which implements Pageable , so the obj returned is of Pageable
+//which is passed to repository methods like findAll .
+
+//So the result coming from repository, is Page of obj, i.e. which contains data and metadata
+//the amount of data needed to be visible to frontend . So Page is an interface, but the repository
+//returns obj of Page type .
