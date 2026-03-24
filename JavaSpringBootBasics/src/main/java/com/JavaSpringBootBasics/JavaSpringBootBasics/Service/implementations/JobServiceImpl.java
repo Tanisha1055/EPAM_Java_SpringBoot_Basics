@@ -8,6 +8,7 @@ import com.JavaSpringBootBasics.JavaSpringBootBasics.Service.interfaces.JobServi
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -69,6 +70,11 @@ public class JobServiceImpl implements JobService {
         return jobRepository.findAll(pageable);
     }
 
+    public Page<Job> findJobsBySortedPage(int page, int size , String sortBy)
+    {
+        Pageable pageable=PageRequest.of(page,size, Sort.by(sortBy).ascending());
+        return jobRepository.findAll(pageable);
+    }
 }
 
 // as rest everything is handled by orElseThrow() , so I can directly use the value .
@@ -104,3 +110,10 @@ public class JobServiceImpl implements JobService {
 //So the result coming from repository, is Page of obj, i.e. which contains data and metadata
 //the amount of data needed to be visible to frontend . So Page is an interface, but the repository
 //returns obj of Page type .
+
+
+//Pagination with sorting:
+
+//So here we also pass the argument saying , by what field do we need to sort by i.e. sortBy.
+//Like w.r.t name , or email or whatever.
+//
