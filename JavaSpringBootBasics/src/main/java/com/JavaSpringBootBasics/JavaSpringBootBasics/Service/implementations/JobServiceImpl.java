@@ -75,6 +75,11 @@ public class JobServiceImpl implements JobService {
         Pageable pageable=PageRequest.of(page,size, Sort.by(sortBy).ascending());
         return jobRepository.findAll(pageable);
     }
+
+    public List<Job> getSortedData(String name)
+    {
+        return jobRepository.findAll(Sort.by(name).ascending());
+    }
 }
 
 // as rest everything is handled by orElseThrow() , so I can directly use the value .
@@ -114,6 +119,12 @@ public class JobServiceImpl implements JobService {
 
 //Pagination with sorting:
 
-//So here we also pass the argument saying , by what field do we need to sort by i.e. sortBy.
-//Like w.r.t name , or email or whatever.
-//
+//So here we also pass the argument saying, by what field do we need to sort by i.e. sortBy.
+//Like w.r.t name, or email or whatever.
+
+//So Sort is a class which has a static method .of() which returns a Sort obj which defines
+//which field and which direction of obj to be sorted by .
+
+//And you pass them in the pagination syntax, to get the sorted page by some criteria .
+
+//So sorting exist individually also, not necessary with pagination .
