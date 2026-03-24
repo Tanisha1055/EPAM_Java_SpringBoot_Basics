@@ -5,6 +5,7 @@ import com.JavaSpringBootBasics.JavaSpringBootBasics.Entity.Job;
 import com.JavaSpringBootBasics.JavaSpringBootBasics.Repository.ApplicantRepository;
 import com.JavaSpringBootBasics.JavaSpringBootBasics.Repository.JobRepository;
 import com.JavaSpringBootBasics.JavaSpringBootBasics.Service.interfaces.JobService;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@Profile("prod")
 public class JobServiceImpl implements JobService {
 
     private final JobRepository jobRepository;
