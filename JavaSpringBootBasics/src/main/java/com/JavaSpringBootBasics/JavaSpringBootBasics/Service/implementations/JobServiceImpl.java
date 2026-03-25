@@ -162,3 +162,17 @@ public class JobServiceImpl implements JobService {
 //fails the original one's data will be saved as that is separate from this one. That is a
 //separate transaction .
 
+//i.e. if this logAudit fails then the main calling function transaction still runs,and commits
+//But if the required type would have been REQUIRED then it joins the existing transaction or
+//if not will start the new one . It is the default level of propagation . But if we require
+//REQUIRES_NEW then it will start new one , used when you want to use third party or independent
+//operations inside the same function .
+
+// The other types of propagation levels are :
+
+//MANDATORY, i.e. it will require a transaction from the calling function or will throw an
+//exception.
+
+//SUPPORTS i.e. it will support a transaction if the calling function has it , and if not
+//then it can run without as well.
+//There are other levels of propagations as well , but theses are main ones.
