@@ -5,6 +5,7 @@ import com.JavaSpringBootBasics.JavaSpringBootBasics.Entity.Job;
 import com.JavaSpringBootBasics.JavaSpringBootBasics.Repository.ApplicantRepository;
 import com.JavaSpringBootBasics.JavaSpringBootBasics.Repository.JobRepository;
 import com.JavaSpringBootBasics.JavaSpringBootBasics.Service.interfaces.JobService;
+import jakarta.transaction.Transactional;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -50,6 +51,7 @@ public class JobServiceImpl implements JobService {
 
 
     @Override
+    @Transactional
     public Job addApplicantToJob(Long jobId, Long applicantId) {
 
         Job job = jobRepository.findById(jobId)
@@ -130,3 +132,14 @@ public class JobServiceImpl implements JobService {
 //And you pass them in the pagination syntax, to get the sorted page by some criteria .
 
 //So sorting exist individually also, not necessary with pagination .
+
+
+
+//Transactions:
+
+//So when to save something to db either when everything written in that method succeed, or
+//not save it otherwise. In other words don't do partial saving in db , i.e. saving some
+// portion of data and nit saving the rest of the further db operations, due to failure midway .
+// In that case transaction would abort the prev operation also ,i.e. if everything succeed
+// then onl we will save in db . At that time we use transactions. So in order to make that
+// method as transactional , we need to annotate it with @Transactional .
