@@ -5,13 +5,15 @@ import com.JavaSpringBootBasics.JavaSpringBootBasics.Entity.Job;
 import com.JavaSpringBootBasics.JavaSpringBootBasics.Repository.ApplicantRepository;
 import com.JavaSpringBootBasics.JavaSpringBootBasics.Repository.JobRepository;
 import com.JavaSpringBootBasics.JavaSpringBootBasics.Service.interfaces.JobService;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 
 import java.util.List;
 
@@ -63,6 +65,7 @@ public class JobServiceImpl implements JobService {
 
         job.getApplicants().add(applicant);
 
+        logAudit("Applicant added to job");
         applicant.getJobs().add(job);
 
         return jobRepository.save(job);
@@ -83,6 +86,12 @@ public class JobServiceImpl implements JobService {
     public List<Job> getSortedData(String name)
     {
         return jobRepository.findAll(Sort.by(name).ascending());
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void logAudit(String message)
+    {
+        System.out.println("Audit Log: "+message);
     }
 }
 
@@ -143,3 +152,13 @@ public class JobServiceImpl implements JobService {
 // In that case transaction would abort the prev operation also ,i.e. if everything succeed
 // then onl we will save in db . At that time we use transactions. So in order to make that
 // method as transactional , we need to annotate it with @Transactional .
+
+
+//Transactions with Propagation:
+
+//So propagation means how a transactional would behave if another transactional methods or
+//normal method calls it. So when we say that the propagation level is REQUIRES_NEW then it
+//starts a new transaction separate from the original one. So even it this methods transaction
+//fails the original one's data will be saved as that is separate from this one. That is a
+//separate transaction .
+
