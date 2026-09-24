@@ -1,0 +1,22 @@
+Important HTTP Status Codes:
+
+Success:
+200 → OK (GET)
+201 → Created (Resource, POST)
+204 → No Content (Successfully deleted , DELETE)
+
+Invalid Client Request:
+400 → Bad Request (Configured from the client side)
+401 → Unauthorized (Doesn't hv permission for the application itself)
+403 → Forbidden (Authorised but not allowed to use the resource)
+404 → Not Found (Resource)
+409 → Conflict
+422 → Validation/semantic error
+429 → Too Many Requests
+
+Server Errors:
+500 → Internal Server Error (means something unexpected happened on the server.)
+                        (Ex:NullPointerException, Database failure ,Unexpected application error)
+502 → Bad Gateway
+503 → Service Unavailable
+504 → Gateway Timeout

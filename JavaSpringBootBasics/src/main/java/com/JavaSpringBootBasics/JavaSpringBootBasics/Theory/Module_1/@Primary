@@ -1,0 +1,80 @@
+The problem
+
+Suppose you have:
+
+interface PaymentService {
+    void pay();
+}
+
+Two implementations:
+
+@Service
+public class UpiPaymentService implements PaymentService {
+    // ...
+}
+
+@Service
+public class CardPaymentService implements PaymentService {
+    // ...
+}
+
+Now Spring sees:
+
+@Service
+public class OrderService {
+
+    private final PaymentService paymentService;
+
+    public OrderService(PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
+}
+
+Spring asks:
+"Which PaymentService should I inject? There are two!"
+
+This causes:
+NoUniqueBeanDefinitionException
+
+@Primary
+
+You can tell Spring:
+
+"Use this implementation by default."
+
+Ex:
+@Service
+@Primary
+public class UpiPaymentService implements PaymentService {
+}
+
+Now:
+
+public OrderService(PaymentService paymentService) {
+    this.paymentService = paymentService;
+}
+
+Spring chooses:
+
+PaymentService
+      │
+      ├── UpiPaymentService  ← @Primary ⭐
+      │
+      └── CardPaymentService
+
+So @Primary means:
+
+When multiple beans match, prefer this bean by default.
+
+Note :
+Even if UpiPaymentService is @Primary, the explicit @Qualifier selection takes precedence.
+
+Summary:
+
+@Primary
+   ↓
+"If nobody specifies, choose me."
+
+@Qualifier
+   ↓
+"I specifically want this one."
