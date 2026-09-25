@@ -1,0 +1,79 @@
+
+spring.jpa.hibernate.ddl-auto, it controls how Hibernate handles your database schema when
+your Spring Boot application starts.
+
+spring.jpa.hibernate.ddl-auto=update
+
+What does ddl-auto mean?
+
+DDL = Data Definition Language
+
+Things like:
+CREATE TABLE
+ALTER TABLE
+DROP TABLE
+
+Hibernate can automatically perform these schema operations based on your @Entity classes.
+
+Main options
+
+Value	               What it does
+none	               Hibernate does nothing to the schema
+validate	           Checks whether DB schema matches entities; doesn't change DB
+update	               Tries to update schema to match entities
+create	               Creates schema when application starts; existing schema may be dropped
+create-drop	           Creates schema at startup and drops it when application stops
+
+Example
+
+@Entity
+public class Employee {
+
+    @Id
+    private Long id;
+
+    private String name;
+}
+
+With:
+
+spring.jpa.hibernate.ddl-auto=update
+
+Hibernate can create/update a table similar to:
+
+CREATE TABLE employee (
+    id BIGINT NOT NULL,
+    name VARCHAR(255),
+    PRIMARY KEY (id)
+);
+
+If later you add:
+
+private String email;
+
+Hibernate with update may alter the table to add the column.
+
+validate vs update
+
+This is especially important for interviews:
+
+spring.jpa.hibernate.ddl-auto=validate
+means:
+"Check that my database schema matches my entities, but don't modify anything."
+
+Whereas:
+spring.jpa.hibernate.ddl-auto=update
+means:
+"Try to modify the schema so that it matches my entities."
+
+For local development:is commonly convenient.
+
+For production, blindly relying on update is generally avoided. Teams typically use database
+migration tools such as Flyway or Liquibase and often configure Hibernate with:
+
+spring.jpa.hibernate.ddl-auto=validate
+
+Interview answer:
+
+"ddl-auto is a Hibernate configuration that controls automatic database schema generation
+and validation based on JPA entity mappings."
