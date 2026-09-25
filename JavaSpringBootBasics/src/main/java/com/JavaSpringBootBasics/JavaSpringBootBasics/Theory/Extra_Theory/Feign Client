@@ -1,0 +1,27 @@
+
+Where does FeignClient fit?
+
+Since you're working with Spring Boot microservices, you'll also encounter:
+
+@FeignClient(name = "user-service")
+public interface UserClient {
+
+    @GetMapping("/users/{id}")
+    User getUser(@PathVariable Long id);
+}
+
+Then:
+
+RestTemplate → HTTP client
+WebClient    → HTTP client
+FeignClient  → Declarative HTTP client
+
+With Feign, you mainly describe the API, rather than manually constructing the HTTP request.
+
+Interview shortcut
+
+Remember:
+
+RestTemplate → old, synchronous/blocking HTTP client
+WebClient → modern, supports non-blocking/reactive HTTP communication
+FeignClient → declarative client where you define the remote API as an interface.

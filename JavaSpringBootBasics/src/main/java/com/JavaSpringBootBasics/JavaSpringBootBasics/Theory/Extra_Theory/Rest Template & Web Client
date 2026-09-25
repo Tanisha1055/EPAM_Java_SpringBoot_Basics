@@ -1,0 +1,136 @@
+
+Both RestTemplate and WebClient are Spring tools used when your application needs to call
+another HTTP API.
+
+For example:
+
+Your Order Service
+       |
+       | GET /users/10
+       ↓
+User Service
+
+Your service needs an HTTP client to make that call.
+
+1. RestTemplate
+
+RestTemplate is the older, synchronous/blocking HTTP client in Spring.
+
+Example:
+
+RestTemplate restTemplate = new RestTemplate();
+
+User user = restTemplate.getForObject(
+    "http://user-service/users/10",
+    User.class
+);
+
+The important part is:
+request → wait → response
+The current thread waits until the response comes back.
+
+So:
+
+RestTemplate = synchronous + blocking
+
+It is still widely seen in existing Spring applications, but for new development,
+Spring generally recommends WebClient.
+
+2. WebClient
+
+WebClient is Spring's modern HTTP client from Spring WebFlux.
+
+Example:
+
+WebClient webClient = WebClient.create();
+
+User user = webClient.get()
+        .uri("http://user-service/users/10")
+        .retrieve()
+        .bodyToMono(User.class)
+        .block();
+
+Notice:
+
+.bodyToMono(User.class)
+
+The response is represented as a Mono<User>.
+
+Notice 2:
+
+Without .block():
+
+Mono<User> user = webClient.get()
+        .uri("http://user-service/users/10")
+        .retrieve()
+        .bodyToMono(User.class);
+
+This is non-blocking/reactive.
+
+One important confusion
+
+You might see:
+WebClient
+    ...
+    .block();
+
+Then someone says:
+
+"But WebClient is non-blocking!"
+
+Technically, WebClient itself supports non-blocking communication, but:
+
+.block()
+
+makes your calling code wait for the result.
+
+So:
+
+Mono<User> user = webClient.get()
+        ...
+        .bodyToMono(User.class);
+
+➡️ reactive/non-blocking style
+
+while:
+User user = webClient.get()
+        ...
+        .bodyToMono(User.class)
+        .block();
+
+➡️ you're using WebClient in a blocking manner.
+
+RestTemplate vs WebClient
+
+|                 | RestTemplate                  | WebClient                      |
+| --------------- | ----------------------------- | ------------------------------ |
+| Style           | Blocking                      | Non-blocking/reactive          |
+| API style       | Synchronous                   | Reactive                       |
+| Introduced      | Older                         | Modern                         |
+| Spring module   | Spring MVC                    | Spring WebFlux                 |
+| Return type     | `User`                        | `Mono<User>` / `Flux<User>`    |
+| Good for        | Existing/simple blocking apps | Reactive/high-concurrency apps |
+| New development | Usually not preferred         | Generally preferred            |
+
+Visual difference
+
+RestTemplate:
+
+Thread
+  │
+  ├── Send request
+  │
+  ├── WAIT 💤
+  │
+  └── Receive response
+
+WebClient:
+
+Thread
+  │
+  ├── Send request
+  │
+  ├── Do other work
+  │
+  └── Process response when available
+
